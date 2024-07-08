@@ -36,33 +36,22 @@ class ForumEditedHistory extends Model
         return $stmt->fetch();
     }
 
-    public static function create($data)
-    {
-        $stmt = self::$db->prepare('INSERT INTO forum_edited_histories (forum_id, previous_content, new_content, user_id) VALUES (:forum_id, :previous_content, :new_content, :user_id)');
-        $stmt->bindParam(':forum_id', $data['forum_id']);
-        $stmt->bindParam(':previous_content', $data['previous_content']);
-        $stmt->bindParam(':new_content', $data['new_content']);
-        $stmt->bindParam(':user_id', $data['user_id']);
-        return $stmt->execute();
-    }
 
-    public static function update($id, $data)
-    {
-        $stmt = self::$db->prepare('UPDATE forum_edited_histories SET forum_id = :forum_id, previous_content = :previous_content, new_content = :new_content, user_id = :user_id WHERE id = :id');
-        $stmt->bindParam(':id', $id);
-        $stmt->bindParam(':forum_id', $data['forum_id']);
-        $stmt->bindParam(':previous_content', $data['previous_content']);
-        $stmt->bindParam(':new_content', $data['new_content']);
-        $stmt->bindParam(':user_id', $data['user_id']);
-        return $stmt->execute();
-    }
-
+  
     public function save()
     {
         if ($this->id) {
-            return $this->update($this->id, $this->toArray());
+            return $this->update(['ForumEditedHistory', 'forum_edited_histories'], $this->id, $this->toArray());
         }
-        return $this->create($this->toArray());
+        return $this->create(['ForumEditedHistory', 'forum_edited_histories'], $this->toArray());
+    }
+
+    //delete function
+    public function delete()
+    {
+        $stmt = self::$db->prepare('DELETE FROM forum_edited_histories WHERE id = :id');
+        $stmt->bindParam(':id', $this->id);
+        return $stmt->execute();
     }
 
     public function toArray()

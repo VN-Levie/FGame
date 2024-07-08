@@ -65,7 +65,7 @@
                               <div class="row">
                                    <div class="col-12 col-md-6 mt-2">
                                         <div class="card">
-                                             <h5 class="card-header">Quản lý người dùng</h5>
+                                             <h5 class="card-header bg-white">Quản lý người dùng</h5>
                                              <div class="card-body">
                                                   <ul>
                                                        <li><a href="/users" class="btn btn-link">Danh sách người dùng</a></li>
@@ -76,29 +76,30 @@
                                    </div>
                                    <div class="col-12 col-md-6 mt-2">
                                         <div class="card">
-                                             <h5 class="card-header">Quản lý diễn đàn</h5>
+                                             <h5 class="card-header bg-white">Quản lý diễn đàn</h5>
                                              <div class="card-body">
                                                   <ul>
                                                        <li><a href="/forums" class="btn btn-link">Quản lý danh mục</a></li>
-                                                       <li><a href="/forums" class="btn btn-link">Danh sách bài viết</a></li>
+                                                       <li><a href="{{ route("dashboard.forum") }}" class="btn btn-link">Danh sách bài viết</a></li>
                                                   </ul>
                                              </div>
                                         </div>
                                    </div>
                                    <div class="col-12 col-md-6 mt-2">
                                         <div class="card">
-                                             <h5 class="card-header">Quản lý gian hàng</h5>
+                                             <h5 class="card-header bg-white">Quản lý gian hàng</h5>
                                              <div class="card-body">
                                                   <ul>
                                                        <li><a href="/shops" class="btn btn-link">Danh mục cửa hàng</a></li>
                                                        <li><a href="/shops" class="btn btn-link">Danh sách sản phẩm</a></li>
+                                                       <li><a href="/shops" class="btn btn-link">Các đơn hàng</a></li>
                                                   </ul>
                                              </div>
                                         </div>
                                    </div>
                                    <div class="col-12 col-md-6 mt-2">
                                         <div class="card">
-                                             <h5 class="card-header">Quản lý Trafic</h5>
+                                             <h5 class="card-header bg-white">Quản lý Trafic</h5>
                                              <div class="card-body">
                                                   <ul>
                                                        <li><a href="/traffics" class="btn btn-link">Chi tiết</a></li>

@@ -21,7 +21,7 @@ class Order extends Model
     public $user_id;
     public $updated_at;
     public $created_at;
-    public $product;
+    // public $product;
 
     public function __construct()
     {
@@ -45,34 +45,7 @@ class Order extends Model
         return $stmt->fetch();
     }
 
-    public static function create($data)
-    {
-        $stmt = self::$db->prepare('INSERT INTO orders (product_id, quantity, product_price, total, status, customer_note, seller_note, user_id) VALUES (:product_id, :quantity, :product_price, :total, :status, :customer_note, :seller_note, :user_id)');
-        $stmt->bindParam(':product_id', $data['product_id']);
-        $stmt->bindParam(':quantity', $data['quantity']);
-        $stmt->bindParam(':product_price', $data['product_price']);
-        $stmt->bindParam(':total', $data['total']);
-        $stmt->bindParam(':status', $data['status']);
-        $stmt->bindParam(':customer_note', $data['customer_note']);
-        $stmt->bindParam(':seller_note', $data['seller_note']);
-        $stmt->bindParam(':user_id', $data['user_id']);
-        return $stmt->execute();
-    }
 
-    public static function update($id, $data)
-    {
-        $stmt = self::$db->prepare('UPDATE orders SET product_id = :product_id, quantity = :quantity, product_price = :product_price, total = :total, status = :status, customer_note = :customer_note, seller_note = :seller_note, user_id = :user_id WHERE id = :id');
-        $stmt->bindParam(':id', $id);
-        $stmt->bindParam(':product_id', $data['product_id']);
-        $stmt->bindParam(':quantity', $data['quantity']);
-        $stmt->bindParam(':product_price', $data['product_price']);
-        $stmt->bindParam(':total', $data['total']);
-        $stmt->bindParam(':status', $data['status']);
-        $stmt->bindParam(':customer_note', $data['customer_note']);
-        $stmt->bindParam(':seller_note', $data['seller_note']);
-        $stmt->bindParam(':user_id', $data['user_id']);
-        return $stmt->execute();
-    }
 
     public static function sum($column, $condition = null)
     {
@@ -85,9 +58,16 @@ class Order extends Model
     public function save()
     {
         if ($this->id) {
-            return $this->update($this->id, $this->toArray());
+            return $this->update(['Order', 'orders'], $this->id, $this->toArray());
         }
-        return $this->create($this->toArray());
+        return $this->create(['Order', 'orders'], $this->toArray());
+    }
+
+    public function delete()
+    {
+        $stmt = self::$db->prepare('DELETE FROM orders WHERE id = :id');
+        $stmt->bindParam(':id', $this->id);
+        return $stmt->execute();
     }
 
     public function toArray()

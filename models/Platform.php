@@ -34,29 +34,21 @@ class Platform extends Model
         return $stmt->fetch();
     }
 
-    public static function create($data)
-    {
-        $stmt = self::$db->prepare('INSERT INTO platforms (name, description) VALUES (:name, :description)');
-        $stmt->bindParam(':name', $data['name']);
-        $stmt->bindParam(':description', $data['description']);
-        return $stmt->execute();
-    }
 
-    public static function update($id, $data)
-    {
-        $stmt = self::$db->prepare('UPDATE platforms SET name = :name, description = :description WHERE id = :id');
-        $stmt->bindParam(':id', $id);
-        $stmt->bindParam(':name', $data['name']);
-        $stmt->bindParam(':description', $data['description']);
-        return $stmt->execute();
-    }
 
     public function save()
     {
         if ($this->id) {
-            return $this->update($this->id, $this->toArray());
+            return $this->update(['Platform', 'platforms'], $this->id, $this->toArray());
         }
-        return $this->create($this->toArray());
+        return $this->create(['Platform', 'platforms'], $this->toArray());
+    }
+
+    public function delete()
+    {
+        $stmt = self::$db->prepare('DELETE FROM platforms WHERE id = :id');
+        $stmt->bindParam(':id', $this->id);
+        return $stmt->execute();
     }
 
     public function toArray()

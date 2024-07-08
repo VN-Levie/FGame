@@ -1,5 +1,5 @@
 <?php
-// ini_set('display_errors', 1);
+ini_set('display_errors', 1);
 
 //định nghĩa ROOT_PATH
 define('ROOT_PATH', __DIR__);
@@ -22,6 +22,7 @@ require_once 'controllers/Controller.php';
 require_once 'controllers/HomeController.php';
 require_once 'controllers/AuthController.php';
 require_once 'controllers/DashboardController.php';
+require_once 'controllers/ForumController.php';
 
 //thực hiện load các Model
 require_once 'models/Model.php';
@@ -32,6 +33,9 @@ require_once 'models/GameCategory.php';
 require_once 'models/Order.php';
 require_once 'models/Traffic.php';
 require_once 'models/Product.php';
+require_once 'models/ForumCategory.php';
+require_once 'models/ForumComment.php';
+
 
 //Bắt đầu session
 session_start();
@@ -83,8 +87,16 @@ $route->post('/change-password', 'AuthController', 'doChangePassword')->name('us
 $route->prefix(
     '/dashboard',
     function ($route, $prefix) {
-        $route->get('/', 'DashboardController', 'index', $prefix)->name('dashboard');
-        $route->get('/test', 'DashboardController', 'index', $prefix)->name('dashboard.test');
+        $route->get('/', 'DashboardController', 'index', $prefix)->name('dashboard');     
+        //forum
+        $route->prefix(
+            '/dashboard/forum',
+            function ($route, $prefix) {
+                $route->get('/', 'ForumController', 'index', $prefix)->name('dashboard.forum');  
+                // categories
+                $route->get('/categories', 'ForumController', 'categories', $prefix)->name('dashboard.forum.categories');
+            }
+        );
     }
 );
 //register route with post method

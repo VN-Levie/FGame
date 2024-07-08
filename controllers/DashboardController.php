@@ -2,6 +2,7 @@
 
 use Controllers\Controller;
 use Models\Forum;
+use Models\ForumComment;
 use Models\Game;
 use Models\GameCategory;
 use Models\Order;
@@ -13,7 +14,7 @@ class DashboardController extends Controller
     public function index()
     {
         $forums = Forum::all();
-        $comments = Forum::count('type', '=', 'comment');
+        $comments = count(ForumComment::all());
         $game_categories = GameCategory::all();
         $games = Game::all();
         $users = User::all();
@@ -21,7 +22,7 @@ class DashboardController extends Controller
         $sum_total = Order::sum('total');
         $traffics = Traffic::sum('count_up');
         $traffics_unique = count(Traffic::all());
-        $oders = Order::withs(['Order', 'orders'], [['Product', 'products'], ['User', 'users']]);
+        $oders = Order::whereWiths(['Order', 'orders'], [['Product', 'products'], ['User', 'users']]);
         // print_r($oders);
         $data = [
             'title' => 'Dashboard',

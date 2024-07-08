@@ -36,26 +36,7 @@ class Traffic extends Model
         return $stmt->fetch();
     }
 
-    public static function create($data)
-    {
-        $stmt = self::$db->prepare('INSERT INTO traffic (ip, user_agent, user_id, count_up) VALUES (:ip, :user_agent, :user_id, :count_up)');
-        $stmt->bindParam(':ip', $data['ip']);
-        $stmt->bindParam(':user_agent', $data['user_agent']);
-        $stmt->bindParam(':user_id', $data['user_id']);
-        $stmt->bindParam(':count_up', $data['count_up']);
-        return $stmt->execute();
-    }
 
-    public static function update($id, $data)
-    {
-        $stmt = self::$db->prepare('UPDATE traffic SET ip = :ip, user_agent = :user_agent, user_id = :user_id, count_up = :count_up WHERE id = :id');
-        $stmt->bindParam(':id', $id);
-        $stmt->bindParam(':ip', $data['ip']);
-        $stmt->bindParam(':user_agent', $data['user_agent']);
-        $stmt->bindParam(':user_id', $data['user_id']);
-        $stmt->bindParam(':count_up', $data['count_up']);
-        return $stmt->execute();
-    }
 
     public static function checkAndCountUpOrInsert($ip, $user_agent, $user_id)
     {
@@ -82,7 +63,7 @@ class Traffic extends Model
                 'user_id' => $user_id,
                 'count_up' => 1
             ];
-            return self::create($data);
+            return self::create(['Traffic', 'traffic'], $data);
         }
     }
 
@@ -98,9 +79,16 @@ class Traffic extends Model
     public function save()
     {
         if ($this->id) {
-            return $this->update($this->id, $this->toArray());
+            return $this->update(['Traffic', 'traffic'], $this->id, $this->toArray());
         }
-        return $this->create($this->toArray());
+        return $this->create(['Traffic', 'traffic'], $this->toArray());
+    }
+
+    public function delete()
+    {
+        $stmt = self::$db->prepare('DELETE FROM traffic WHERE id = :id');
+        $stmt->bindParam(':id', $this->id);
+        return $stmt->execute();
     }
 
     public function toArray()

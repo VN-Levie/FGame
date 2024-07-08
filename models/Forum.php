@@ -7,10 +7,10 @@ use PDO;
 class Forum extends Model
 {
     public $id;
-    public $parent_id;
+    public $category_id;
     public $content;
-    public $type;
     public $user_id;
+    public $views; // Thêm thuộc tính views
     public $updated_at;
     public $created_at;
 
@@ -36,57 +36,49 @@ class Forum extends Model
         return $stmt->fetch();
     }
 
-    public static function create($data)
-    {
-        $stmt = self::$db->prepare('INSERT INTO forum (parent_id, content, type, user_id) VALUES (:parent_id, :content, :type, :user_id)');
-        $stmt->bindParam(':parent_id', $data['parent_id']);
-        $stmt->bindParam(':content', $data['content']);
-        $stmt->bindParam(':type', $data['type']);
-        $stmt->bindParam(':user_id', $data['user_id']);
-        return $stmt->execute();
-    }
 
-    public static function update($id, $data)
-    {
-        $stmt = self::$db->prepare('UPDATE forum SET parent_id = :parent_id, content = :content, type = :type, user_id = :user_id WHERE id = :id');
-        $stmt->bindParam(':id', $id);
-        $stmt->bindParam(':parent_id', $data['parent_id']);
-        $stmt->bindParam(':content', $data['content']);
-        $stmt->bindParam(':type', $data['type']);
-        $stmt->bindParam(':user_id', $data['user_id']);
-        return $stmt->execute();
-    }
-
-    public static function count($column, $operator = '=', $value = null)
-    {
-        $stmt = self::$db->prepare("SELECT COUNT(*) FROM forum WHERE $column $operator :value");
-        $stmt->bindParam(':value', $value);
-        $stmt->execute();
-        return $stmt->fetchColumn();
-    }
-
-    public static function last(){
-        $stmt = self::$db->prepare('SELECT * FROM forum ORDER BY id DESC LIMIT 1');
-        $stmt->setFetchMode(PDO::FETCH_CLASS, 'Models\Forum');
-        $stmt->execute();
-        return $stmt->fetch();
-    }
 
     public function save()
     {
         if ($this->id) {
-            return $this->update($this->id, $this->toArray());
+            return self::update(['Forum', 'forum'], $this->id, $this->toArray());
         }
-        return $this->create($this->toArray());
+        return self::create(['Forum', 'forum'], $this->toArray());
+    }
+
+    //delete function
+    public function delete()
+    {
+        $stmt = self::$db->prepare('DELETE FROM forum WHERE id = :id');
+        $stmt->bindParam(':id', $this->id);
+        return $stmt->execute();
     }
 
     public function toArray()
     {
         return [
-            'parent_id' => $this->parent_id,
+            'category_id' => $this->category_id,
             'content' => $this->content,
-            'type' => $this->type,
-            'user_id' => $this->user_id
+            'user_id' => $this->user_id,
+            'views' => $this->views // Thêm views vào mảng
         ];
+    }
+
+    public function getCategory()
+    {
+        return ForumCategory::find($this->category_id);
+    }
+
+    // Lấy comments
+    public function getComments()
+    {
+        return ForumComment::whereWiths(['ForumComment', 'forum_comment'], [['User', 'users']], ['forum_id' => $this->id]);
+    }
+
+    public static function countUpView($id)
+    {
+        $stmt = self::$db->prepare('UPDATE forum SET views = views + 1 WHERE id = :id');
+        $stmt->bindParam(':id', $id);
+        return $stmt->execute();
     }
 }

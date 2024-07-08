@@ -49,6 +49,7 @@ class Route
         } else {
             return View::abort(404, "Route <strong>{$path}</strong> not found.");
         }
+        // print_r($routes);
     }
 
     public  function get($path, $controller, $method, $prefix = null)

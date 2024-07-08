@@ -34,29 +34,21 @@ class GameCategory extends Model
         return $stmt->fetch();
     }
 
-    public static function create($data)
-    {
-        $stmt = self::$db->prepare('INSERT INTO game_categories (name, description) VALUES (:name, :description)');
-        $stmt->bindParam(':name', $data['name']);
-        $stmt->bindParam(':description', $data['description']);
-        return $stmt->execute();
-    }
-
-    public static function update($id, $data)
-    {
-        $stmt = self::$db->prepare('UPDATE game_categories SET name = :name, description = :description WHERE id = :id');
-        $stmt->bindParam(':id', $id);
-        $stmt->bindParam(':name', $data['name']);
-        $stmt->bindParam(':description', $data['description']);
-        return $stmt->execute();
-    }
+  
 
     public function save()
     {
         if ($this->id) {
-            return $this->update($this->id, $this->toArray());
+            return $this->update(['GameCategory', 'game_categories'], $this->id, $this->toArray());
         }
-        return $this->create($this->toArray());
+        return $this->create(['GameCategory', 'game_categories'], $this->toArray());
+    }
+
+    public function delete()
+    {
+        $stmt = self::$db->prepare('DELETE FROM game_categories WHERE id = :id');
+        $stmt->bindParam(':id', $this->id);
+        return $stmt->execute();
     }
 
     public function toArray()

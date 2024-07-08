@@ -14,6 +14,10 @@ class Product extends Model
     public $category_id;
     public $status;
     public $pinned;
+    public $views; // Thêm thuộc tính views
+    public $is_digital; // Thêm thuộc tính is_digital
+    public $digital_info; // Thêm thuộc tính digital_info
+    public $digital_template_id; // Thêm thuộc tính digital_template_id
     public $updated_at;
     public $created_at;
 
@@ -39,39 +43,20 @@ class Product extends Model
         return $stmt->fetch();
     }
 
-    public static function create($data)
-    {
-        $stmt = self::$db->prepare('INSERT INTO products (name, description, price, stock, category_id, status, pinned) VALUES (:name, :description, :price, :stock, :category_id, :status, :pinned)');
-        $stmt->bindParam(':name', $data['name']);
-        $stmt->bindParam(':description', $data['description']);
-        $stmt->bindParam(':price', $data['price']);
-        $stmt->bindParam(':stock', $data['stock']);
-        $stmt->bindParam(':category_id', $data['category_id']);
-        $stmt->bindParam(':status', $data['status']);
-        $stmt->bindParam(':pinned', $data['pinned']);
-        return $stmt->execute();
-    }
-
-    public static function update($id, $data)
-    {
-        $stmt = self::$db->prepare('UPDATE products SET name = :name, description = :description, price = :price, stock = :stock, category_id = :category_id, status = :status, pinned = :pinned WHERE id = :id');
-        $stmt->bindParam(':id', $id);
-        $stmt->bindParam(':name', $data['name']);
-        $stmt->bindParam(':description', $data['description']);
-        $stmt->bindParam(':price', $data['price']);
-        $stmt->bindParam(':stock', $data['stock']);
-        $stmt->bindParam(':category_id', $data['category_id']);
-        $stmt->bindParam(':status', $data['status']);
-        $stmt->bindParam(':pinned', $data['pinned']);
-        return $stmt->execute();
-    }
 
     public function save()
     {
         if ($this->id) {
-            return $this->update($this->id, $this->toArray());
+            return $this->update(['Product', 'products'],$this->id, $this->toArray());
         }
-        return $this->create($this->toArray());
+        return $this->create(['Product', 'products'],$this->toArray());
+    }
+
+    public function delete()
+    {
+        $stmt = self::$db->prepare('DELETE FROM products WHERE id = :id');
+        $stmt->bindParam(':id', $this->id);
+        return $stmt->execute();
     }
 
     public function toArray()
@@ -83,7 +68,18 @@ class Product extends Model
             'stock' => $this->stock,
             'category_id' => $this->category_id,
             'status' => $this->status,
-            'pinned' => $this->pinned
+            'pinned' => $this->pinned,
+            'views' => $this->views,
+            'is_digital' => $this->is_digital,
+            'digital_info' => $this->digital_info,
+            'digital_template_id' => $this->digital_template_id
         ];
+    }
+
+    public static function countUpView($id)
+    {
+        $stmt = self::$db->prepare('UPDATE products SET views = views + 1 WHERE id = :id');
+        $stmt->bindParam(':id', $id);
+        return $stmt->execute();
     }
 }

@@ -36,33 +36,22 @@ class Game extends Model
         return $stmt->fetch();
     }
 
-    public static function create($data)
-    {
-        $stmt = self::$db->prepare('INSERT INTO games (title, description, release_date, platform_id) VALUES (:title, :description, :release_date, :platform_id)');
-        $stmt->bindParam(':title', $data['title']);
-        $stmt->bindParam(':description', $data['description']);
-        $stmt->bindParam(':release_date', $data['release_date']);
-        $stmt->bindParam(':platform_id', $data['platform_id']);
-        return $stmt->execute();
-    }
 
-    public static function update($id, $data)
-    {
-        $stmt = self::$db->prepare('UPDATE games SET title = :title, description = :description, release_date = :release_date, platform_id = :platform_id WHERE id = :id');
-        $stmt->bindParam(':id', $id);
-        $stmt->bindParam(':title', $data['title']);
-        $stmt->bindParam(':description', $data['description']);
-        $stmt->bindParam(':release_date', $data['release_date']);
-        $stmt->bindParam(':platform_id', $data['platform_id']);
-        return $stmt->execute();
-    }
+  
 
     public function save()
     {
         if ($this->id) {
-            return $this->update($this->id, $this->toArray());
+            return $this->update(['Game', 'games'], $this->id, $this->toArray());
         }
-        return $this->create($this->toArray());
+        return $this->create(['Game', 'games'], $this->toArray());
+    }
+
+    public function delete()
+    {
+        $stmt = self::$db->prepare('DELETE FROM games WHERE id = :id');
+        $stmt->bindParam(':id', $this->id);
+        return $stmt->execute();
     }
 
     public function toArray()

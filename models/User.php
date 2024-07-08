@@ -36,26 +36,6 @@ class User extends Model
         return $stmt->fetch();
     }
 
-    public static function create($data)
-    {
-        $stmt = self::$db->prepare('INSERT INTO users (username, password, roles, email) VALUES (:username, :password, :roles, :email)');
-        $stmt->bindParam(':username', $data['username']);
-        $stmt->bindParam(':password', $data['password']);
-        $stmt->bindParam(':roles', $data['roles']);
-        $stmt->bindParam(':email', $data['email']);
-        return $stmt->execute();
-    }
-
-    public static function update($id, $data)
-    {
-        $stmt = self::$db->prepare('UPDATE users SET username = :username, password = :password, roles = :roles, email = :email WHERE id = :id');
-        $stmt->bindParam(':id', $id);
-        $stmt->bindParam(':username', $data['username']);
-        $stmt->bindParam(':password', $data['password']);
-        $stmt->bindParam(':roles', $data['roles']);
-        $stmt->bindParam(':email', $data['email']);
-        return $stmt->execute();
-    }
 
     public static function where($column, $operator = '=', $value = null)
     {
@@ -73,7 +53,8 @@ class User extends Model
         $stmt->execute();
         return $stmt->fetchColumn();
     }
-    public static function last(){
+    public static function last()
+    {
         $stmt = self::$db->prepare('SELECT * FROM users ORDER BY id DESC LIMIT 1');
         $stmt->setFetchMode(PDO::FETCH_CLASS, 'Models\User');
         $stmt->execute();
@@ -84,9 +65,16 @@ class User extends Model
     public function  save()
     {
         if ($this->id) {
-            return $this->update($this->id, $this->toArray());
+            return $this->update(['User', 'users'], $this->id, $this->toArray());
         }
-        return $this->create($this->toArray());
+        return $this->create(['User', 'users'], $this->toArray());
+    }
+
+    public function delete()
+    {
+        $stmt = self::$db->prepare('DELETE FROM users WHERE id = :id');
+        $stmt->bindParam(':id', $this->id);
+        return $stmt->execute();
     }
 
     //get user by username

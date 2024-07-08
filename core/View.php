@@ -11,6 +11,8 @@ class View
             $data[] = $hide_header;
             $data[] = $user;
             extract($data);
+            //chuyển . thành /
+            $path = str_replace('.', '/', $path);
             $head = self::get_contents('views/layouts/header');
             $contents = self::get_contents('views/' . $path);
             $end = self::get_contents('views/layouts/footer');
