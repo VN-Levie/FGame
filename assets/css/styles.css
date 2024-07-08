@@ -1,3 +1,11 @@
 .clearfix{
     clear: both;
 }
+a{
+    text-decoration: none !important;
+    color: #000;
+}
+
+li{
+    list-style: none;
+}

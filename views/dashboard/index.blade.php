@@ -131,6 +131,10 @@
                                         <tbody>
                                              @foreach ($oders as $oder)
                                                   <tr>
+                                                       {{-- <pre>
+                                                             {{ print_r($oder) }}
+                                                       </pre> --}}
+                                                      
                                                        <th scope="row"> {{ $oder->id }} </th>
                                                        <td> {{ $oder->product->name }} </td>
                                                        <td> {{ $oder->user->username }} </td>

@@ -94,7 +94,7 @@ class Model
     private static function createModelFromRow($row, $model, $alias_name = null)
     {
         $model_fullPath = "Models\\" . $model;
-        $alias_name = $alias_name ?? strtolower($model);
+        $alias_name = $alias_name ?? strtolower($model) . 's';
         $instance = new $model_fullPath();
 
         foreach ($row as $key => $value) {
@@ -188,10 +188,10 @@ class Model
         // echo $sql;
         $stmt->execute($conditions);
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
+        // var_dump($results);
         $objs = [];
         foreach ($results as $row) {
-            $obj = self::createModelFromRow($row, $model_main);
+            $obj = self::createModelFromRow($row, $model_main, $table_main);
             foreach ($props as $index => $prop) {
                 $obj->$prop = self::createModelFromRow($row, $dependents[$index][0], "t" . ($index + 1));
             }

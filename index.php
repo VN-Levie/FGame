@@ -52,11 +52,7 @@ $model = new Model();
 
 // Lấy người dùng từ session nếu có
 
-if (isset($_SESSION['user'])) {
-    $user = User::find($_SESSION['user']->id);
-} else {
-    $user = null;
-}
+$user = isset($_SESSION['user']) ? User::find($_SESSION['user']->id) : null;
 
 //Kiểm tra traffic
 $ip = $_SERVER['REMOTE_ADDR'] ?? null;

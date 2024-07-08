@@ -37,6 +37,7 @@ class Route
     public function run()
     {
         $path = $_SERVER['REQUEST_URI'];
+        
         $path = rtrim($path, '/');
         $path = parse_url($path, PHP_URL_PATH);
         $method = $_SERVER['REQUEST_METHOD'];
