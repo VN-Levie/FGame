@@ -6,11 +6,13 @@ use PDO;
 
 class Forum extends Model
 {
+    protected static $table = 'forum';
     public $id;
     public $category_id;
+    public $title;
     public $content;
     public $user_id;
-    public $views; // Thêm thuộc tính views
+    public $views;
     public $updated_at;
     public $created_at;
 
@@ -27,14 +29,7 @@ class Forum extends Model
         return $stmt->fetchAll();
     }
 
-    public static function find($id): Forum
-    {
-        $stmt = self::$db->prepare('SELECT * FROM forum WHERE id = :id');
-        $stmt->bindParam(':id', $id);
-        $stmt->setFetchMode(PDO::FETCH_CLASS, 'Models\Forum');
-        $stmt->execute();
-        return $stmt->fetch();
-    }
+
 
 
 
@@ -58,6 +53,7 @@ class Forum extends Model
     {
         return [
             'category_id' => $this->category_id,
+            'title' => $this->title,
             'content' => $this->content,
             'user_id' => $this->user_id,
             'views' => $this->views // Thêm views vào mảng

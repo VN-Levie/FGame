@@ -8,13 +8,15 @@ use View;
 
 class StoredRoute
 {
+    public $_requestMethod;
     public $name;
     public $path;
     public $controller;
-    public $method;
+    public $methodName;
+
     public $prefix;
 
-    public  function name($name)
+    public function name($name)
     {
         $this->name = $name;
         return $this;
@@ -37,7 +39,7 @@ class Route
     public function run()
     {
         $path = $_SERVER['REQUEST_URI'];
-        
+
         $path = rtrim($path, '/');
         $path = parse_url($path, PHP_URL_PATH);
         $method = $_SERVER['REQUEST_METHOD'];
@@ -45,7 +47,7 @@ class Route
         $storedRoute = $routes[$path] ?? null;
         if ($storedRoute) {
             $controller = new $storedRoute->controller();
-            $method = $storedRoute->method;
+            $method = $storedRoute->methodName;
             $controller->$method();
         } else {
             return View::abort(404, "Route <strong>{$path}</strong> not found.");
@@ -63,10 +65,12 @@ class Route
             $path = $prefix ? $prefix . $path : $path;
             // echo $path;
             $storedRoute = new StoredRoute();
+            $storedRoute->_requestMethod = 'GET';
             $storedRoute->path = $path;
             $storedRoute->controller = $controller;
-            $storedRoute->method = $method;
+            $storedRoute->methodName = $method;
             $storedRoute->prefix = $prefix;
+
 
             // echo $path;
             $this->routes['GET'][$path] = $storedRoute;
@@ -82,17 +86,36 @@ class Route
     {
         // echo '123' . $name . '<br>';
         $routes = $this->routes['GET'];
-        $routes = array_merge($routes, $this->routes['POST']);
         $found = false;
+        //get
         foreach ($routes as $route) {
+            // echo "$route->name<br>"; 
             if ($route->name == $name) {
+
                 $path = $route->path;
                 foreach ($params as $key => $value) {
                     $path = str_replace("{{$key}}", $value, $path);
                 }
-                echo (DOMAIN . $path);
+                echo DOMAIN . $path;
                 $found = true;
                 break;
+            }
+        }
+        //post
+        if (!$found) {
+            $routes = $this->routes['POST'];
+
+            foreach ($routes as $route) {
+                // echo "$route->name<br>";
+                if ($route->name == $name) {
+                    $path = $route->path;
+                    foreach ($params as $key => $value) {
+                        $path = str_replace("{{$key}}", $value, $path);
+                    }
+                    echo DOMAIN . $path;
+                    $found = true;
+                    break;
+                }
             }
         }
         if (!$found) {
@@ -102,11 +125,11 @@ class Route
             // throw new \Exception("Route::route() <br>Route <strong>'{$name}'</strong> not found.");
         }
     }
-
     //prefix route
     public  function prefix($prefix, $callback)
     {
         $callback($this, $prefix);
+        // print_r($this);
     }
 
 
@@ -122,9 +145,10 @@ class Route
             }
             $path = $prefix ? $prefix . $path : $path;
             $storedRoute = new StoredRoute();
+            $storedRoute->_requestMethod = 'POST';
             $storedRoute->path = $path;
             $storedRoute->controller = $controller;
-            $storedRoute->method = $method;
+            $storedRoute->methodName = $method;
             $storedRoute->prefix = $prefix;
 
             // echo $path;

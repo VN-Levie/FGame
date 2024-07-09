@@ -83,14 +83,21 @@ $route->post('/change-password', 'AuthController', 'doChangePassword')->name('us
 $route->prefix(
     '/dashboard',
     function ($route, $prefix) {
-        $route->get('/', 'DashboardController', 'index', $prefix)->name('dashboard');     
+        $route->get('/', 'DashboardController', 'index', $prefix)->name('dashboard');
         //forum
         $route->prefix(
             '/dashboard/forum',
             function ($route, $prefix) {
-                $route->get('/', 'ForumController', 'index', $prefix)->name('dashboard.forum');  
+                $route->get('/', 'ForumController', 'index', $prefix)->name('dashboard.forum');
+                //post form
+                $route->get('/form-post', 'ForumController', 'postForm', $prefix)->name('dashboard.forum.form.post');
+                $route->post('/form-post', 'ForumController', 'postFormSubmit', $prefix)->name('dashboard.forum.post.submit');
+
                 // categories
                 $route->get('/categories', 'ForumController', 'categories', $prefix)->name('dashboard.forum.categories');
+                //create category
+                // $route->get('/categories/create', 'ForumController', 'createCategory', $prefix)->name('dashboard.forum.categories.create');
+                // $route->post('/categories/create', 'ForumController', 'doCreateCategory', $prefix)->name('dashboard.forum.categories.create.submit');
             }
         );
     }

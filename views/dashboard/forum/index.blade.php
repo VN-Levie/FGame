@@ -4,7 +4,9 @@
           <div class="row">
                <div class="col-12 col-xl-12 mb-4 mb-lg-0 mt-3">
                     <div class="card">
-                         <h5 class="card-header">Latest transactions</h5>
+                         <h5 class="card-header">Danh sách bài viết |                              
+                              <a href="{{ route('dashboard.forum.form.post') }}" class="btn btn-sm btn-primary">Tạo bài viết</a>
+                         </h5>
                          <div class="card-body">
 
                               <div class="table-responsive">
@@ -12,11 +14,11 @@
                                         <thead>
                                              <tr>
                                                   <th scope="col">#</th>
-                                                  <th scope="col">Title</th>
-                                                  <th scope="col">Category</th>
-                                                  <th scope="col">User</th>
+                                                  <th scope="col">Tiêu đề</th>
+                                                  <th scope="col">Danh mục</th>
+                                                  <th scope="col">Người đăng</th>
                                                   <th scope="col">View</th>
-                                                  <th scope="col">Date</th>
+                                                  <th scope="col">Ngày đăng</th>
                                                   <th scope="col"></th>
                                              </tr>
                                         </thead>
@@ -28,7 +30,7 @@
                                                        </pre> --}}
                                                      
                                                        <th scope="row"> {{ $post->id }} </th>
-                                                       <td> {{ $post->content }} </td>
+                                                       <td> {{ $post->title }} </td>
                                                        <td> {{ $post?->category?->name }} </td>
                                                        <td> {{ $post?->user?->username }} </td>
                                                        <td> {{ number_format($post->views) }}</td>

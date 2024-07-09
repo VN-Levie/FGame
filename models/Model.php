@@ -9,6 +9,8 @@ class Model
 {
     protected static $db;
 
+    protected static $table;
+
     public function __construct()
     {
         if (!isset(self::$db)) {
@@ -16,6 +18,17 @@ class Model
             self::$db = $database->connect();
         }
     }
+
+    public static function find($id)
+    {
+        $stmt = self::$db->prepare('SELECT * FROM ' . static::$table . ' WHERE id = :id');
+        $stmt->bindParam(':id', $id);
+        $stmt->setFetchMode(PDO::FETCH_CLASS, get_called_class());
+        $stmt->execute();
+        $result = $stmt->fetch();
+        return $result === false ? null : $result;
+    }
+    
 
     public static function update($model, $id, $data)
     {
