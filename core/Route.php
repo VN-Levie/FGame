@@ -80,62 +80,6 @@ class Route
         }
     }
 
-
-    //get route url bằng name và bind các tham số
-    public  function route($name, $params = [])
-    {
-        // echo '123' . $name . '<br>';
-        $routes = $this->routes['GET'];
-        $found = false;
-        //get
-        foreach ($routes as $route) {
-            // echo "$route->name<br>"; 
-            if ($route->name == $name) {
-
-                $path = $route->path;
-                foreach ($params as $key => $value) {
-                    $path = str_replace("{{$key}}", $value, $path);
-                }
-                echo DOMAIN . $path;
-                $found = true;
-                break;
-            }
-        }
-        //post
-        if (!$found) {
-            $routes = $this->routes['POST'];
-
-            foreach ($routes as $route) {
-                // echo "$route->name<br>";
-                if ($route->name == $name) {
-                    $path = $route->path;
-                    foreach ($params as $key => $value) {
-                        $path = str_replace("{{$key}}", $value, $path);
-                    }
-                    echo DOMAIN . $path;
-                    $found = true;
-                    break;
-                }
-            }
-        }
-        if (!$found) {
-            // return View::abort(500, "Route::route() <br>Route <strong>{$name}</strong> not found.");
-            return View::renderError(new \Exception("Route::route() <br>Route <strong>'{$name}'</strong> not found."));
-            // throw
-            // throw new \Exception("Route::route() <br>Route <strong>'{$name}'</strong> not found.");
-        }
-    }
-    //prefix route
-    public  function prefix($prefix, $callback)
-    {
-        $callback($this, $prefix);
-        // print_r($this);
-    }
-
-
-
-
-
     public  function post($path, $controller, $method, $prefix = null)
     {
         $path = rtrim($path, '/');
@@ -157,5 +101,69 @@ class Route
         } else {
             return View::abort(500, "Route::post() <br>Controller <strong>{$controller}</strong> not found.");
         }
+    }
+
+    //get route url bằng name và bind các tham số
+    public  function route($name, $params = [])
+    {
+        // echo '123' . $name . '<br>';
+        $routes = $this->routes['GET'];
+        $found = false;
+        $url = DOMAIN;
+
+        //get
+        foreach ($routes as $route) {
+            // echo "$route->name<br>"; 
+            if ($route->name == $name) {
+
+                $path = $route->path;
+                foreach ($params as $key => $value) {
+                    $path = str_replace("{{$key}}", $value, $path);
+                }
+                $url .= $path;
+                $found = true;
+                break;
+            }
+        }
+        //post
+        if (!$found) {
+            $routes = $this->routes['POST'];
+
+            foreach ($routes as $route) {
+                // echo "$route->name<br>";
+                if ($route->name == $name) {
+                    $path = $route->path;
+                    foreach ($params as $key => $value) {
+                        $path = str_replace("{{$key}}", $value, $path);
+                    }
+                    $url .= $path;
+                    $found = true;
+                    break;
+                }
+            }
+        }
+
+        if (!$found) {
+            // return View::abort(500, "Route::route() <br>Route <strong>{$name}</strong> not found.");
+            return View::renderError(new \Exception("Route::route() <br>Route <strong>'{$name}'</strong> not found."));
+            // throw
+            // throw new \Exception("Route::route() <br>Route <strong>'{$name}'</strong> not found.");
+        } else {
+            //add params
+            if (count($params) > 0) {
+                $url .= '?';
+                foreach ($params as $key => $value) {
+                    $url .= "$key=$value&";
+                }
+                $url = rtrim($url, '&');
+            }
+            return $url;
+        }
+    }
+    //prefix route
+    public  function prefix($prefix, $callback)
+    {
+        $callback($this, $prefix);
+        // print_r($this);
     }
 }

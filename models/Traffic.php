@@ -81,7 +81,7 @@ class Traffic extends Model
         if ($this->id) {
             return $this->update(['Traffic', 'traffic'], $this->id, $this->toArray());
         }
-        return $this->create(['Traffic', 'traffic'], $this->toArray());
+        return $this->create($this->toArray());
     }
 
     public function delete()

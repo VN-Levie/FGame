@@ -41,7 +41,7 @@ class GameCategory extends Model
         if ($this->id) {
             return $this->update(['GameCategory', 'game_categories'], $this->id, $this->toArray());
         }
-        return $this->create(['GameCategory', 'game_categories'], $this->toArray());
+        return $this->create($this->toArray());
     }
 
     public function delete()

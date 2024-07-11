@@ -1,29 +1,21 @@
 <div class="container">
      <main class="col-md-12 ml-sm-auto col-lg-12 px-md-4 py-4 p-3">
-          <h1 class="h2">Tạo bài viết </h1>
+          <h1 class="h2">{{ $category?->id ? 'Chỉnh sửa' : 'Tạo mới' }} danh mục</h1>
           <div class="row">
                <div class="col-12 col-xl-12 mb-4 mb-lg-0 mt-3">
                     <div class="card">
-                         <h5 class="card-header">Tạo bài viết mới</h5>
+                         <h5 class="card-header">
+                              {{ $category?->id ? 'Chỉnh sửa' : 'Tạo mới' }} danh mục
+                         </h5>
                          <div class="card-body">
                               <form method="POST" action="#" id="postSubmit">
-                                   <input type="hidden" name="id" value="{{ $post?->id ?? null }}">
+                                   <input type="hidden" name="id" value="{{ $category?->id ?? null }}">
                                    <div class="form-group">
-                                        <label for="title">Tiêu đề</label>
-                                        <input type="text" class="form-control" id="title" name="title" placeholder="Nhập tiêu đề" value="{{ $post?->title ?? null }}">
+                                        <label for="name">Tên danh mục</label>
+                                        <input type="text" class="form-control" id="name" name="name" placeholder="Nhập tiêu đề" value="{{ $category?->name ?? null }}">                                       
                                         <div class="form-group">
-                                             <label for="category">Chọn danh mục</label>
-                                             <select class="form-control" id="category" name="category">
-                                                  @foreach ($form_categories as $category)
-                                                       <option value="{{ $category->id }}" {{ $post?->category_id == $category->id ? "selected" : null }}>
-                                                            {{ $category->name }}
-                                                       </option>
-                                                  @endforeach
-                                             </select>
-                                        </div>
-                                        <div class="form-group">
-                                             <label for="content">Nội dung</label>
-                                             <textarea class="form-control" id="content" name="content" cols="30" rows="10">{{ $post?->content ?? null }}</textarea>
+                                             <label for="content">Mô tả</label>
+                                             <textarea class="form-control" id="content" name="content" cols="30" rows="10">{{ $category?->description ?? null }}</textarea>
                                         </div>
 
                                         <div class="form-group">
@@ -34,7 +26,7 @@
                               </form>
                          </div>
                          <hr>
-                         <a href="{{ route("dashboard.forum") }}" class="btn btn-block btn-light">
+                         <a href="{{ route("dashboard.forum.categories") }}" class="btn btn-block btn-light">
                               <i class="fas fa-arrow-left"></i> Quay lại
                          </a>
                          <a href="{{ route("dashboard") }}" class="btn btn-block btn-light">

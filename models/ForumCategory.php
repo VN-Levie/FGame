@@ -6,6 +6,8 @@ use PDO;
 
 class ForumCategory extends Model
 {
+    protected static $table = 'forum_categories';
+
     public $id;
     public $name;
     public $description;
@@ -26,23 +28,12 @@ class ForumCategory extends Model
         return $stmt->fetchAll();
     }
 
-    public static function find($id): ForumCategory
-    {
-        $stmt = self::$db->prepare('SELECT * FROM forum_categories WHERE id = :id');
-        $stmt->bindParam(':id', $id);
-        $stmt->setFetchMode(PDO::FETCH_CLASS, 'Models\ForumCategory');
-        $stmt->execute();
-        return $stmt->fetch();
-    }
-
-
-
     public function save()
     {
         if ($this->id) {
             return self::update(['ForumCategory', 'forum_categories'], $this->id, $this->toArray());
         }
-        return self::create(['ForumCategory', 'forum_categories'], $this->toArray());
+        return self::create($this->toArray());
     }
 
     //delete function
@@ -60,5 +51,11 @@ class ForumCategory extends Model
             'description' => $this->description,
             'user_id' => $this->user_id
         ];
+    }
+
+    //posts
+    public function posts()
+    {
+        return Forum::where('category_id', $this->id);
     }
 }

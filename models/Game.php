@@ -44,7 +44,7 @@ class Game extends Model
         if ($this->id) {
             return $this->update(['Game', 'games'], $this->id, $this->toArray());
         }
-        return $this->create(['Game', 'games'], $this->toArray());
+        return $this->create($this->toArray());
     }
 
     public function delete()

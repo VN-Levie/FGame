@@ -42,7 +42,7 @@ class DigitalTemplate extends Model
         if ($this->id) {
             return $this->update(['DigitalTemplate', 'digital_template'], $this->id, $this->toArray());
         }
-        return $this->create(['DigitalTemplate', 'digital_template'], $this->toArray());
+        return $this->create($this->toArray());
     }
 
     //delete function

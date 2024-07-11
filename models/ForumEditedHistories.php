@@ -43,7 +43,7 @@ class ForumEditedHistory extends Model
         if ($this->id) {
             return $this->update(['ForumEditedHistory', 'forum_edited_histories'], $this->id, $this->toArray());
         }
-        return $this->create(['ForumEditedHistory', 'forum_edited_histories'], $this->toArray());
+        return $this->create($this->toArray());
     }
 
     //delete function

@@ -38,7 +38,7 @@ class Forum extends Model
         if ($this->id) {
             return self::update(['Forum', 'forum'], $this->id, $this->toArray());
         }
-        return self::create(['Forum', 'forum'], $this->toArray());
+        return self::create($this->toArray());
     }
 
     //delete function
@@ -68,7 +68,7 @@ class Forum extends Model
     // Lấy comments
     public function getComments()
     {
-        return ForumComment::whereWiths(['ForumComment', 'forum_comment'], [['User', 'users']], ['forum_id' => $this->id]);
+        return ForumComment::whereWiths([['User']], ['forum_id' => $this->id]);
     }
 
     public static function countUpView($id)

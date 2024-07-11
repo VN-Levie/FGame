@@ -22,7 +22,7 @@ class DashboardController extends Controller
         $sum_total = Order::sum('total');
         $traffics = Traffic::sum('count_up');
         $traffics_unique = count(Traffic::all());
-        $oders = Order::whereWiths(['Order', 'orders'], [['Product', 'products'], ['User', 'users']]);
+        $oders = Order::whereWiths([['Product'], ['User']]);
         // print_r($oders);
         $data = [
             'title' => 'Dashboard',

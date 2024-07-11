@@ -21,19 +21,77 @@ class Model
 
     public static function find($id)
     {
-        $stmt = self::$db->prepare('SELECT * FROM ' . static::$table . ' WHERE id = :id');
+        if (!is_numeric($id)) {
+            return null;
+        }
+        $stmt = self::$db->prepare('SELECT * FROM ' . static::getTableName() . ' WHERE id = :id');
         $stmt->bindParam(':id', $id);
         $stmt->setFetchMode(PDO::FETCH_CLASS, get_called_class());
         $stmt->execute();
         $result = $stmt->fetch();
         return $result === false ? null : $result;
     }
-    
 
-    public static function update($model, $id, $data)
+    //get table name form model name
+    public static function getTableName()
     {
-        $model_name = $model[0];
-        $table_name = $model[1];
+        //nếu tồn tại $table thì trả về luôn
+        if (isset(static::$table)) {
+            return static::$table;
+        }
+        //nếu không thì tự suy ra tên bảng theo quy tắc
+        $table_name = get_called_class();
+        //loại bỏ models\ ở đầu nếu có
+        $table_name = str_replace('Models\\', '', $table_name);
+        //thêm dấu _ giữa các từ
+        $table_name = preg_replace('/(?<!^)[A-Z]/', '_$0', $table_name);
+        //kiểm tra quy tắc tiếng anh
+        if (substr($table_name, -1) === 'y') {
+            $table_name = substr($table_name, 0, -1) . 'ies';
+        } else {
+            $table_name .= 's';
+        }
+        //chuyển thành chữ thường
+        $table_name = strtolower($table_name);
+        return $table_name;
+    }
+
+    public static function getPropName()
+    {
+
+        //nếu không thì tự suy ra tên bảng theo quy tắc
+        $prop_name = get_called_class();
+        //loại bỏ models\ ở đầu nếu có
+        $prop_name = str_replace('Models\\', '', $prop_name);
+        //thêm dấu _ giữa các từ
+        $prop_name = preg_replace('/(?<!^)[A-Z]/', '_$0', $prop_name);
+        //chuyển thành chữ thường
+        $prop_name = strtolower($prop_name);
+         //loại bỏ s hoăc es ở cuối theo quy tắc tiếng anh
+        if (substr($prop_name, -3) === 'ies') {
+            $prop_name = substr($prop_name, 0, -3) . 'y';
+        } else if (substr($prop_name, -1) === 's') {
+            $prop_name = substr($prop_name, 0, -1);
+        }
+        // echo $prop_name;
+        return $prop_name;
+    }
+
+    //Forum::where('category_id', $this->id)
+    public static function where($column, $value)
+    {
+        $stmt = self::$db->prepare('SELECT * FROM ' . static::$table . ' WHERE ' . $column . ' = :value');
+        $stmt->bindParam(':value', $value);
+        $stmt->setFetchMode(PDO::FETCH_CLASS, get_called_class());
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+
+    public static function update($id, $data)
+    {
+        $model_name = get_called_class();
+        $table_name =  static::getTableName();
         $model_fullPath = "Models\\" . $model_name;
         $instance = new $model_fullPath();
         $props = array_keys(get_object_vars($instance));
@@ -60,12 +118,11 @@ class Model
         return $stmt->execute();
     }
     //create
-    public static function create($model, $data)
+    public static function create($data)
     {
-        $model_name = $model[0];
-        $table_name = $model[1];
-        $model_fullPath = "Models\\" . $model_name;
-        $instance = new $model_fullPath();
+        $model = get_called_class();
+        $table_name = static::getTableName();
+        $instance = new $model();
         $props = array_keys(get_object_vars($instance));
         $sql = "INSERT INTO $table_name (";
         foreach ($props as $prop) {
@@ -96,21 +153,22 @@ class Model
         }
         return $stmt->execute();
     }
+
     /**
      * Tạo một đối tượng model từ một hàng dữ liệu.
      *
-     * @param array $row Dữ liệu từ một hàng (row) của kết quả truy vấn.
+     * @param array $data Dữ liệu từ một hàng (row) của kết quả truy vấn.
      * @param string $model Tên model cần tạo đối tượng.
      * @param string|null $alias_name Tên alias của model (nếu có), mặc định là null.
      * @return object Đối tượng model đã được tạo và ánh xạ dữ liệu.
      */
-    private static function createModelFromRow($row, $model, $alias_name = null)
+    private static function createModel($model, $data,  $alias_name = null)
     {
-        $model_fullPath = "Models\\" . $model;
-        $alias_name = $alias_name ?? strtolower($model) . 's';
-        $instance = new $model_fullPath();
 
-        foreach ($row as $key => $value) {
+        $alias_name = $alias_name ?? strtolower($model) . 's';
+        $instance = new $model();
+
+        foreach ($data as $key => $value) {
             if (strpos($key, $alias_name . "_") === 0) {
                 $key = substr($key, strlen($alias_name) + 1);
             }
@@ -122,43 +180,42 @@ class Model
     }
     /**
      * Thực hiện eager loading dữ liệu từ các bảng liên quan.
-     *
-     * @param array $m1 Thông tin về model và bảng chính. Ví dụ: ['ModelName', 'model_table'].
-     * @param array $dependents Thông tin về các model và bảng phụ thuộc, dạng mảng các mảng. `[['ModelName', 'model_table', 'column_dependent', 'dependent_name'], ...]`.
+     *     
+     * @param array $dependents Thông tin về các model và bảng phụ thuộc, dạng mảng các mảng. `[['ModelName', 'column_dependent', 'dependent_name'], ...]`.
      * @param array $conditions Điều kiện truy vấn WHERE, dạng mảng `key`-`value`.
      * @param int $limit Giới hạn số lượng bản ghi, mặc định là `-1` (không giới hạn).
      * @param int $page Trang hiện tại để phân trang, mặc định là `1`.
      * @return array Mảng các đối tượng đã được eager loaded.
      */
-    public static function whereWiths(array $m1, array $dependents = [], $conditions = [], $sort_by = 'ASC', $order_by = null, $limit = -1, $page = 1)
+    public static function whereWiths(array $dependents = [], $conditions = [], $sort_by = 'ASC', $order_by = null, $limit = -1, $page = 1)
     {
-        $model_path = "Models\\";
-        $model_main = $m1[0];
-        $table_main = $m1[1];
+
+        $model_main =  get_called_class();
+        $table_main = static::getTableName();
+        // echo $table_main;
 
         $props = [];
         $columns = [];
         $aliases = [];
         $tables_dot_star = [];
-
         foreach ($dependents as $index => $m) {
-            $model_dependent = $m[0];
-            $table_dependent = $m[1];
-            $column_dependent = $m[2] ?? strtolower($model_dependent) . "_id";
-            $props[] = $m[3] ?? strtolower($model_dependent);
+            $dependents[$index][0] = $model_dependent = "Models\\" . $m[0];
+            $table_dependent = $model_dependent::getTableName();
+            $prop_name = $model_dependent::getPropName();
+            $column_dependent = $m[1] ?? $prop_name . "_id";
+            $props[] = $m[2] ?? $model_dependent::getPropName();
             $columns[] = $column_dependent;
             $aliases[$index] = $table_dependent . " AS t" . ($index + 1);
-            $fullPathDependentModel = $model_path . $model_dependent;
-            $instance = new $fullPathDependentModel();
-            $propsDependent = array_keys(get_object_vars($instance));
+            $propsDependent = array_keys(get_object_vars(new $model_dependent()));
 
             foreach ($propsDependent as $prop) {
                 $tables_dot_star[] = "t" . ($index + 1) . ".$prop as t" . ($index + 1) . "_$prop";
             }
         }
 
-        $fullPathMainModel = $model_path . $model_main;
-        $instance = new $fullPathMainModel();
+
+
+        $instance = new $model_main();
         $propsMain = array_keys(get_object_vars($instance));
 
         $sql = "SELECT";
@@ -169,8 +226,9 @@ class Model
             $sql .= " $table_dot_star,";
         }
         $sql = rtrim($sql, ',') . " FROM $table_main";
-
+        // echo $table_main . "<br>";
         foreach ($aliases as $key => $alias) {
+            // echo $columns[$key] . " | " . $alias . "<br>";
             $sql .= " JOIN $alias ON $table_main." . $columns[$key] . " = t" . ($key + 1) . ".id";
         }
 
@@ -182,7 +240,7 @@ class Model
             }
             $sql .= implode(" AND ", $where);
         }
-
+        // echo $sql;
         if ($order_by) {
             $sql .= " ORDER BY $table_main.$order_by $sort_by";
         } else {
@@ -203,10 +261,13 @@ class Model
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
         // var_dump($results);
         $objs = [];
+        // echo "<br>";
+        // print_r($dependents);
+        // echo "<br>";
         foreach ($results as $row) {
-            $obj = self::createModelFromRow($row, $model_main, $table_main);
+            $obj = self::createModel($model_main, $row, $table_main);
             foreach ($props as $index => $prop) {
-                $obj->$prop = self::createModelFromRow($row, $dependents[$index][0], "t" . ($index + 1));
+                $obj->$prop = self::createModel($dependents[$index][0], $row, "t" . ($index + 1));
             }
             $objs[] = $obj;
         }

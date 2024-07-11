@@ -40,9 +40,9 @@ class Cart extends Model
     public function save()
     {
         if ($this->id) {
-            return $this->update(['Cart', 'carts'], $this->id, $this->toArray());
+            return $this->update($this->id, $this->toArray());
         }
-        return $this->create(['Cart', 'carts'], $this->toArray());
+        return $this->create($this->toArray());
     }
 
     //delete function

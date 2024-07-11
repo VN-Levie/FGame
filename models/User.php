@@ -67,7 +67,7 @@ class User extends Model
         if ($this->id) {
             return $this->update(['User', 'users'], $this->id, $this->toArray());
         }
-        return $this->create(['User', 'users'], $this->toArray());
+        return $this->create($this->toArray());
     }
 
     public function delete()

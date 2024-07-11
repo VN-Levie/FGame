@@ -95,9 +95,9 @@ $route->prefix(
 
                 // categories
                 $route->get('/categories', 'ForumController', 'categories', $prefix)->name('dashboard.forum.categories');
-                //create category
-                // $route->get('/categories/create', 'ForumController', 'createCategory', $prefix)->name('dashboard.forum.categories.create');
-                // $route->post('/categories/create', 'ForumController', 'doCreateCategory', $prefix)->name('dashboard.forum.categories.create.submit');
+                //category form create/update
+                $route->get('/categories/form', 'ForumController', 'categoryForm', $prefix)->name('dashboard.forum.categories.form');
+                $route->post('/categories/form', 'ForumController', 'categoryFormSubmit', $prefix)->name('dashboard.forum.categories.form.submit');
             }
         );
     }

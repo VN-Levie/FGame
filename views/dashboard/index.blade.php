@@ -79,7 +79,7 @@
                                              <h5 class="card-header bg-white">Quản lý diễn đàn</h5>
                                              <div class="card-body">
                                                   <ul>
-                                                       <li><a href="/forums" class="btn btn-link">Quản lý danh mục</a></li>
+                                                       <li><a href="{{ route("dashboard.forum.categories") }}" class="btn btn-link">Quản lý danh mục</a></li>
                                                        <li><a href="{{ route("dashboard.forum") }}" class="btn btn-link">Danh sách bài viết</a></li>
                                                   </ul>
                                              </div>

@@ -42,7 +42,7 @@ class ForumComment extends Model
         if ($this->id) {
             return self::update(['ForumComment', 'forum_comment'], $this->id, $this->toArray());
         }
-        return self::create(['ForumComment', 'forum_comment'], $this->toArray());
+        return self::create($this->toArray());
     }
 
     //delete function

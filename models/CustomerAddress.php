@@ -46,7 +46,7 @@ class CustomerAddress extends Model
         if ($this->id) {
             return $this->update(['CustomerAddress', 'customer_address'], $this->id, $this->toArray());
         }
-        return $this->create(['CustomerAddress', 'customer_address'], $this->toArray());
+        return $this->create($this->toArray());
     }
 
     public function delete()

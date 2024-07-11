@@ -41,7 +41,7 @@ class Platform extends Model
         if ($this->id) {
             return $this->update(['Platform', 'platforms'], $this->id, $this->toArray());
         }
-        return $this->create(['Platform', 'platforms'], $this->toArray());
+        return $this->create($this->toArray());
     }
 
     public function delete()

@@ -60,7 +60,7 @@ class Order extends Model
         if ($this->id) {
             return $this->update(['Order', 'orders'], $this->id, $this->toArray());
         }
-        return $this->create(['Order', 'orders'], $this->toArray());
+        return $this->create($this->toArray());
     }
 
     public function delete()

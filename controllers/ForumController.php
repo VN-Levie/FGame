@@ -10,8 +10,8 @@ class ForumController extends Controller
 {
     public function index()
     {
-        $post_dependents = [['ForumCategory', 'forum_categories', 'category_id', 'category'], ['User', 'users']];
-        $posts = Forum::whereWiths(['Forum', 'forum'], $post_dependents, sort_by: 'DESC');
+        $post_dependents = [['ForumCategory', 'category_id'], ['User']];
+        $posts = Forum::whereWiths($post_dependents, sort_by: 'DESC');
         // var_dump($posts);
         $data = [
             'title' => 'Quản lý bài viết forum',
@@ -21,24 +21,6 @@ class ForumController extends Controller
         $this->view('dashboard.forum.index', $data);
     }
 
-    public function categories()
-    {
-        $form_categories = ForumCategory::all();
-        $data = [
-            'game_categories' => $form_categories
-        ];
-        $this->view('dashboard.forum.categories', $data);
-    }
-
-    //create category
-    public function createCategory()
-    {
-        $form_categories = ForumCategory::all();
-        $data = [
-            'game_categories' => $form_categories
-        ];
-        $this->view('dashboard.forum.createCategory', $data);
-    }
 
     //form post
     public function postForm()
@@ -74,7 +56,7 @@ class ForumController extends Controller
         $title = $_POST['title'] ?? null;
         $content = $_POST['content'] ?? null;
         $category = $_POST['category'] ?? null;
-        $user_id = $_SESSION['user']?->id ?? null;
+        $user_id = $user?->id ?? null;
         //check null title
         if (!$title) {
             return $this->json([
@@ -116,6 +98,94 @@ class ForumController extends Controller
         $post->content = $content;
         $post->category_id = $category;
         $post->save();
+        return $this->json([
+            'status' => 'success',
+            'message' => $mess
+        ]);
+
+        // header('Location: ' . route('dashboard.forum'));
+    }
+
+
+    public function categories()
+    {
+
+        $dependents = [['User']];
+        $form_categories = ForumCategory::whereWiths($dependents);
+        // print_r($form_categories);
+        $data = [
+            'form_categories' => $form_categories
+        ];
+        $this->view('dashboard.forum.categories', $data);
+    }
+
+    //create category
+    public function categoryForm()
+    {
+        $id = $_GET['id'] ?? null;
+        // if($id == null){
+        //     return View::abort(404, 'Danh mục không tồn tại');
+        // }
+        $category = ForumCategory::find($id) ?? null;
+        $data = [
+            'category' => $category
+        ];
+        $this->view('dashboard.forum.categoryForm', $data);
+    }
+
+    //categoryFormSubmit
+    public function categoryFormSubmit()
+    {
+        global $user;
+        if (!$user) {
+            return $this->json([
+                'status' => 'error',
+                'message' => 'Vui lòng đăng nhập'
+            ]);
+        }
+        //check role 'mod'
+        if (!$user->checkRole("mod")) {
+            return $this->json([
+                'status' => 'error',
+                'message' => 'Bạn không có quyền'
+            ]);
+        }
+        $id = $_POST['id'] ?? null;
+        $name = $_POST['name'] ?? null;
+        $description = $_POST['description'] ?? null;
+        $user_id = $user?->id ?? null;
+        //check null name
+        if (!$name) {
+            return $this->json([
+                'status' => 'error',
+                'message' => 'Vui lòng nhập tên'
+            ]);
+        }
+        //check null description
+        if (!$description) {
+            return $this->json([
+                'status' => 'error',
+                'message' => 'Vui lòng nhập mô tả'
+            ]);
+        }
+
+        if ($id != null) {
+            $category = ForumCategory::find($id);
+            if (!$category) {
+                return $this->json([
+                    'status' => 'error',
+                    'message' => 'Danh mục không tồn tại'
+                ]);
+            }
+            $mess = 'Cập nhật thành công';
+        } else {
+            $category = new ForumCategory();
+            $mess = 'Tạo danh mục thành công';
+        }
+        $category->name = $name;
+        $category->description = $description;
+        $category->user_id = $user_id;
+        $category->save();
         return $this->json([
             'status' => 'success',
             'message' => $mess
