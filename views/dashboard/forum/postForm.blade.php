@@ -21,7 +21,7 @@
                                    </div>
                                    <div class="form-group">
                                         <label for="content">Nội dung</label>
-                                        <textarea class="form-control" id="content" name="content" cols="30" rows="10"></textarea>
+                                        <textarea class="form-control" id="content" name="content" cols="30" rows="10">gfg</textarea>
                                    </div>
 
                                    <div class="form-group">
