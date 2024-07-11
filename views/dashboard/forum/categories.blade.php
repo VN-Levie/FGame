@@ -1,3 +1,5 @@
+@extends("layouts.app")
+@section("content")
 <div class="container">
      <main class="col-md-12 ml-sm-auto col-lg-12 px-md-4 py-4 p-3">
           <h1 class="h2">Dashboard </h1>
@@ -57,3 +59,5 @@
 
           </div>
      </main>
+</div>
+@endsection

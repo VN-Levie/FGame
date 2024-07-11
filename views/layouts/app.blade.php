@@ -29,10 +29,9 @@ $backgroud_img = $backgroud_img ?? false;
      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-     
+
 
 </head>
-<?php if (!$hide_header) : ?>
 <nav class="navbar navbar-expand-sm bg-light  navbar-light fixed-top">
      <div class="container-fluid">
           <a class="navbar-brand" href="/">
@@ -125,7 +124,7 @@ $backgroud_img = $backgroud_img ?? false;
           </div>
      </div>
 </nav>
-<?php endif; ?>
+
 
 <div class="container" style="margin-top: 100px;"></div>
 <!-- background full scren autp fill none-rp -->
@@ -144,3 +143,52 @@ $backgroud_img = $backgroud_img ?? false;
 <?php endif; ?>
 
 <body>
+     @yield("content")
+
+     <footer class="footer">
+          <div class="container">
+
+          </div>
+     </footer>
+
+     <span href="#" id="toTopBtn" class="cd-top rounded-pill p-3" data-abc="true">
+          <i class="fa-solid fa-chevron-up"></i>
+     </span>
+     <style>
+          #toTopBtn {
+               position: fixed;
+               bottom: 26px;
+               right: 39px;
+               z-index: 98;
+               /* padding: 21px; */
+               background-color: hsla(5, 76%, 62%, .8);
+
+          }
+
+          /* hover cd top change cusor */
+          .cd-top:hover {
+               cursor: pointer;
+          }
+     </style>
+     <script>
+          $(document).ready(function() {
+               $(window).scroll(function() {
+                    if ($(this).scrollTop() > 50) {
+                         $('#toTopBtn').fadeIn();
+                    } else {
+                         $('#toTopBtn').fadeOut();
+                    }
+               });
+
+               $('#toTopBtn').click(function() {
+                    $("html, body").animate({
+                         scrollTop: 0
+                    }, 1000);
+                    return false;
+               });
+          });
+     </script>
+
+</body>
+
+</html>

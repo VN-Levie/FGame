@@ -4,6 +4,7 @@ namespace Core;
 
 use PDO;
 use PDOException;
+use View;
 
 class Database
 {
@@ -17,27 +18,12 @@ class Database
     {
         $this->conn = null;
         try {
-            $this->conn = new PDO('mysql:host=' . $this->host . ';dbname=' . $this->db_name, $this->username, $this->password);
+            $this->conn = new PDO('mysql:host=' . $this->host . ';dbname=' . $this->db_name . ';charset=utf8mb4', $this->username, $this->password);
             $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             // echo 'Connected successfully';
-        } catch (PDOException $e) {
-            // echo 'Connection Error: ' . $e->getMessage();
-            die('Connection Error: ' . $e->getMessage());
+        } catch (PDOException $e) {           
+            return View::abort(500, 'Connection Error: ' . $e->getMessage());
         }
         return $this->conn;
-    }
-
-    public $old_db = null;
-    public function test()
-    {
-        try {
-            $db = new PDO("mysql:host=localhost;dbname=$this->db_name", $this->username, $this->password);
-            $db->exec("set names utf8mb4");
-            return $db;
-        } catch (PDOException $e) {
-            //echo $e->getMessage();
-            echo 'Loi ket noi';
-            exit;
-        }
     }
 }

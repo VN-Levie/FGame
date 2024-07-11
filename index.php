@@ -4,7 +4,7 @@ ini_set('display_errors', 1);
 //định nghĩa ROOT_PATH
 define('ROOT_PATH', __DIR__);
 //định nghĩa CACHE_VIEW
-define('CAHCE_VIEW', false);
+define('CAHCE_VIEW', true);
 // upload path
 define('UPLOAD_PATH', ROOT_PATH . '/uploads/');
 //domain
@@ -49,7 +49,8 @@ use Models\User;
 
 //Khởi tạo base model để kết nối db
 $model = new Model();
-
+//open connection
+$model->openConnection();
 // Lấy người dùng từ session nếu có
 
 $user = isset($_SESSION['user']) ? User::find($_SESSION['user']->id) : null;
@@ -107,3 +108,4 @@ $route->prefix(
 
 //run route
 $route->run();
+$model->closeConnection();

@@ -12,7 +12,7 @@ class AuthController extends Controller
             'title' => 'Đăng nhập',
             'backgroud_img' => 'https://i.imgur.com/H5Ez361.jpg'
         ];
-        $this->view('auth/login', $data, true);
+        $this->view('auth/login', $data);
     }
 
     public function doLogin()
@@ -70,7 +70,7 @@ class AuthController extends Controller
             'title' => 'Đăng ký',
             'backgroud_img' => 'https://i.imgur.com/H5Ez361.jpg'
         ];
-        $this->view('auth/register', $data, true);
+        $this->view('auth/register', $data);
     }
 
     public function doRegister()

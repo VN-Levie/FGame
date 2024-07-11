@@ -10,7 +10,7 @@ class HomeController extends Controller {
         $forums = Forum::all();
         $game_categories = GameCategory::all();
         $game = Game::all();
-        $this->view('home/index');
+        View::render('home.index');
     }
 
     public function about() {      

@@ -5,6 +5,6 @@
           <div class="col-md-12">
                <h1>Trang chủ</h1>
           </div>
-          {{ route("dashboard.forum.categories") }}
      </div>
+</div>
 @endsection

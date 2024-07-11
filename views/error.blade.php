@@ -3,7 +3,7 @@
 
 <head>
     <title>
-        Error <?= $error_code ?? 500 ?> - <?= $error_message ?? 'Something went wrong' ?>
+        Error <?= $error_code ?? 500 ?>
     </title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">

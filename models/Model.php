@@ -4,6 +4,7 @@ namespace Models;
 
 use Core\Database;
 use PDO;
+use View;
 
 class Model
 {
@@ -12,7 +13,9 @@ class Model
 
     protected static $table;
 
-    public function __construct()
+
+    //open connection
+    public function openConnection()
     {
         if (!isset(self::$db)) {
             $database = new Database();
@@ -20,13 +23,23 @@ class Model
         }
     }
 
+    //close connection
+    public function closeConnection()
+    {
+        self::$db = null;
+    }
+
     //all
     public static function all()
     {
+      try {
         $stmt = self::$db->prepare('SELECT * FROM ' . static::getTableName());
         $stmt->setFetchMode(PDO::FETCH_CLASS, get_called_class());
         $stmt->execute();
         return $stmt->fetchAll();
+      } catch (\Throwable $th) {
+        return View::abort(500, $th->getMessage());
+      }
     }
 
     public static function find($id)
@@ -299,19 +312,24 @@ class Model
 
     public static function count($condition = [])
     {
-        $table_name = static::getTableName();
-        $sql = "SELECT COUNT(*) FROM $table_name";
-        if (!empty($condition)) {
-            $where = [];
-            foreach ($condition as $key => $value) {
-                $where[] = "$key = :$key";
+        try {
+            $table_name = static::getTableName();
+            $sql = "SELECT COUNT(*) FROM $table_name";
+            if (!empty($condition)) {
+                $where = [];
+                foreach ($condition as $key => $value) {
+                    $where[] = "$key = :$key";
+                }
+                $sql .= " WHERE " . implode(" AND ", $where);
             }
-            $sql .= " WHERE " . implode(" AND ", $where);
+            $stmt = self::$db->prepare($sql);
+            $stmt->execute($condition);
+            return $stmt->fetchColumn();
+        } catch (\Throwable $th) {
+            return View::abort(500, $th->getMessage());
         }
-        $stmt = self::$db->prepare($sql);
-        $stmt->execute($condition);
-        return $stmt->fetchColumn();
     }
+
 
     //min
     public static function min($column, $condition = [])

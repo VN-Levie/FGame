@@ -7,16 +7,16 @@ use View;
 class Controller
 {
 
-    public function view($view, $data = [], $hide_header = false)
+    public function view($view, $data = [])
     {
-        return View::render($view, $data, $hide_header);
+        return View::render($view, $data);
     }
 
 
     public function json($data)
     {
         header('Content-Type: application/json');
-        die (json_encode($data));
+        die(json_encode($data));
     }
 
     public function dd($data)

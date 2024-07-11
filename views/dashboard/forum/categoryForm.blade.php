@@ -1,3 +1,5 @@
+@extends("layouts.app")
+@section("content")
 <div class="container">
      <main class="col-md-12 ml-sm-auto col-lg-12 px-md-4 py-4 p-3">
           <h1 class="h2">{{ $category?->id ? 'Chỉnh sửa' : 'Tạo mới' }} danh mục</h1>
@@ -116,3 +118,4 @@
      </script>
 
 </div>
+@endsection

@@ -145,9 +145,9 @@ class Route
 
         if (!$found) {
             // return View::abort(500, "Route::route() <br>Route <strong>{$name}</strong> not found.");
-            return View::renderError(new \Exception("Route::route() <br>Route <strong>'{$name}'</strong> not found."));
+            // return View::renderError(new \Exception("Route::route() <br>Route <strong>'{$name}'</strong> not found."));
             // throw
-            // throw new \Exception("Route::route() <br>Route <strong>'{$name}'</strong> not found.");
+            throw new \Exception("Route::route() <br>Route <strong>'{$name}'</strong> not found.");
         } else {
             //add params
             if (count($params) > 0) {

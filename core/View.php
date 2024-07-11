@@ -4,45 +4,53 @@ use Core\Route;
 
 class View
 {
-    public static function render($path, $data = [], $hide_header = false)
+
+    private static $sections = [];
+    private static $extends = null;
+
+    public static function render($path, $data = [])
     {
         try {
-            global $user, $route;
-            $data[] = $hide_header;
+            global $user, $route;            
             $data[] = $user;
             extract($data);
-            //chuyển . thành /
-            $path = str_replace('.', '/', $path);
-            $head = self::get_contents('views/layouts/header');
-            $contents = self::get_contents('views/' . $path);
-            $end = self::get_contents('views/layouts/footer');
-            eval('?>' . self::template($head));
-            eval('?>' . self::template($contents)); // eval: thực thi 1 chuỗi php
-            eval('?>' . self::template($end));
-        } catch (\Throwable $th) {
 
-            (self::renderError($th));
-        }
-    }
+            // // Chuyển . thành /
 
-    public static function renderPartial($path, $data = [])
-    {
-        try {
-            extract($data);
-            $contents = self::get_contents('views/' . $path);
-            eval('?>' . self::template($contents));
-        } catch (\Throwable $th) {
-            // Xóa mọi thành phần hiện có
-            while (ob_get_level()) {
-                ob_end_clean();
+            // $content = self::template(self::get_contents('views/' . $path));
+            // // $content = self::handlerLayout(self::get_contents('views/' . $path));
+            // // $content = static::handlerSection($content);
+            // // print_r(self::$extends);
+            // if (self::$extends != null) {
+            //     $content = self::template(self::get_contents('views/' . self::$extends));
+            // }
+            $content = self::template(self::get_contents('views/' . $path), $path);
+
+            if (count(self::$sections) > 0) {
+                if (self::$extends == null) {
+                    return;
+                }
+                $layout = self::template(self::get_contents('views/' . self::$extends), self::$extends);
+                foreach (self::$sections as $key => $value) {
+                    // echo $value;
+                    $layout = str_replace('@yield("' . $key . '")', $value, $layout);
+                }
+                // echo 'trong';
+                return eval('?>' . $layout);
             }
-            // Gọi hàm renderError
+            //echo 'ngoài';
+
+            eval('?>' . $content); // eval: thực thi 1 chuỗi php
+        } catch (\Throwable $th) {
+            $hide_header = true;
             self::renderError($th);
+        //   return  self::abort(500, $th);
         }
     }
-
+    // renderPartial
     private static function get_contents($path)
     {
+        $path = str_replace('.', '/', $path);
         $contents = null;
         // echo $path;
         if (file_exists($path . '.php')) {
@@ -58,25 +66,24 @@ class View
         return $contents;
     }
 
-    private static function template($text)
+
+    private static function template($text, $path = null)
     {
+        global $user, $route;
         $cache_name = md5($text);
         $cache_file = 'cache/views/' . $cache_name . '.php';
         if (CAHCE_VIEW) {
             if (file_exists($cache_file)) {
-                return file_get_contents($cache_file);
+                //return file_get_contents($cache_file);
             }
         }
-        // Route
 
-        //route('route.name', ['id' => 1])
+        // Route
         $text = preg_replace('/route\((.+?)\)/', '$route->route($1)', $text);
         //{{-- , --}}
         $text = preg_replace('/\{\{--(.+?)--\}\}/s', '<?php /* $1 */ ?>', $text);
-
         $text = preg_replace('/\{\{(.+?)\}\}/', '<?php echo htmlspecialchars($1); ?>', $text);
         //{{ $var }}
-
         //{!! $var !!}
         $text = preg_replace('/\{\!\!(.+?)\!\!\}/', '<?php echo $1; ?>', $text);
         // @php
@@ -104,11 +111,17 @@ class View
         $text = preg_replace('/@endswitch\n/', '<?php endswitch; ?>', $text);
         // @include
         $text = preg_replace('/@include\((.+?)\)/', '<?php include $1; ?>', $text);
+        self::handlerLayout($text);
+        self::handlerSection($text);
         // @extends
-        $text = preg_replace('/@extends\((.+?)\)/', '<?php require $1; ?>', $text);
-        //lưu vào cache       
-        //tìm cà xóa khoảng trắng thừa, tab, dòng trắng
-        // $text = preg_replace('/\s+/', ' ', $text);
+        $text = preg_replace('/@extends\((.+?)\)/', '', $text);
+        // @section, @endsection
+        $text = preg_replace('/@section\("(.+?)"\)/', '', $text);
+        $text = preg_replace('/@endsection\n/', '', $text);
+        // lưu vào cache       
+        // thêm {{-- $path | date()--}} và đầu file
+        $text = '<?php /*' . $path . ' | ' . date('Y-m-d H:i:s') . '*/ ?>' . "\n" . $text;
+
         if (CAHCE_VIEW) {
             if (!file_exists('cache/views')) {
                 mkdir('cache/views', 0777, true);
@@ -116,9 +129,44 @@ class View
             file_put_contents($cache_file, $text);
         }
 
-        // file_put_contents($cache_file, $text);
         return $text;
     }
+
+    static  function handlerSection($input)
+    {
+
+        $regex = '/@section\("(.+?)"\)(.*?)@endsection/s';
+        if (is_array($input)) {
+            // echo 'ok';
+            $name = $input[1];
+            $content = $input[2];
+            self::$sections[$name] = $content;
+
+            return '';
+        }
+        return preg_replace_callback($regex, 'self::handlerSection', $input);
+    }
+
+
+
+    public static function handlerLayout($input)
+    {
+
+
+        // @extends
+        $regex = '/@extends\((.+?)\)/';
+        if (is_array($input)) {
+            $path = $input[1];
+            $path = str_replace('"', '', $path);
+            $path = str_replace("'", '', $path);
+            self::$extends = $path;
+            return '';
+        }
+        return preg_replace_callback($regex, 'self::handlerLayout', $input);
+    }
+
+
+
 
     public static function renderError($th)
     {
@@ -147,7 +195,7 @@ class View
         ];
         http_response_code($code);
         extract($data);
-        require 'views/error.php';
+        require 'views/error.blade.php';
         exit;
     }
 }
