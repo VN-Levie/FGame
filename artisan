@@ -2,20 +2,24 @@
 <?php
 
 require __DIR__ . '/core/Application.php';
+require __DIR__ . '/core/ConsoleColor.php';
 require __DIR__ . '/commands/GreetCommand.php';
 require __DIR__ . '/commands/MakeModelCommand.php';
 require __DIR__ . '/commands/MakeControllerCommand.php';
 require __DIR__ . '/commands/MakeViewCommand.php';
+require __DIR__ . '/commands/ServeCommand.php';
 
 use Core\Application;
 use Commands\GreetCommand;
 use Commands\MakeModelCommand;
 use Commands\MakeControllerCommand;
 use Commands\MakeViewCommand;
+use Commands\ServeCommand;
 
 $app = new Application();
 $app->addCommand(new GreetCommand());
 $app->addCommand(new MakeModelCommand());
 $app->addCommand(new MakeControllerCommand());
 $app->addCommand(new MakeViewCommand());
+$app->addCommand(new ServeCommand());
 $app->run();

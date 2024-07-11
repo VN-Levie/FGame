@@ -16,7 +16,7 @@ class Application
         global $argv;
 
         if (count($argv) < 2) {
-            echo "No command provided.\n";
+            $this->showHelp();
             exit(1);
         }
 
@@ -25,6 +25,15 @@ class Application
             $this->commands[$commandName]->execute();
         } else {
             echo "Command not found.\n";
+            $this->showHelp();
+        }
+    }
+
+    private function showHelp()
+    {
+        echo "Available commands:\n";
+        foreach ($this->commands as $command) {
+            echo "  " . $command->getName() . "\n";
         }
     }
 }
