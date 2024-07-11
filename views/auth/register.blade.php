@@ -1,10 +1,13 @@
-<?php
-// nếu đã đăng nhập thì chuyển hướng về trang chủ
-if (isset($_SESSION['user'])) {
-    header('Location: /');
-    die;
-}
-?>
+@extends("layouts.app")
+@section("content")
+     @php
+          // nếu đã đăng nhập thì chuyển hướng về trang chủ
+          if (isset($_SESSION["user"])) {
+              header("Location: /");
+              die();
+          }
+     @endphp
+
 <style>
     /* Tùy chỉnh CSS cho form đăng nhập */
     .login-form {
@@ -122,3 +125,4 @@ if (isset($_SESSION['user'])) {
         });
     });
 </script>
+@endsection

@@ -2,7 +2,11 @@
 @section("content")
 <div class="container-fluid">
      <main class="col-md-12 ml-sm-auto col-lg-12 px-md-4 py-4 p-3">
-          <h1 class="h2">Dashboard </h1>
+          <nav aria-label="breadcrumb">
+               <ol class="breadcrumb">
+                    <li class="breadcrumb-item active" aria-current="page">Dashboard</li>                    
+               </ol>
+          </nav>
           <div class="row my-4">
                <div class="col-12 col-md-6 col-lg-3 mb-4 mb-lg-0">
                     <div class="card">

@@ -1,6 +1,8 @@
-<?php
-$backgroud_img = $backgroud_img ?? false;
-?>
+@php
+$backgroud_img ??= false;
+$hide_navbar ??= false;
+@endphp
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -32,98 +34,101 @@ $backgroud_img = $backgroud_img ?? false;
 
 
 </head>
-<nav class="navbar navbar-expand-sm bg-light  navbar-light fixed-top">
-     <div class="container-fluid">
-          <a class="navbar-brand" href="/">
-               <img src="/assets/images/logo.png" alt="Avatar Logo" style="width:40px;" class="rounded-pill">
-               FGame
-          </a>
+@if (!$hide_navbar)
+     <nav class="navbar navbar-expand-sm bg-light  navbar-light fixed-top">
+          <div class="container-fluid">
+               <a class="navbar-brand" href="/">
+                    <img src="/assets/images/logo.png" alt="Avatar Logo" style="width:40px;" class="rounded-pill">
+                    FGame
+               </a>
 
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
-               <span class="navbar-toggler-icon"></span>
-          </button>
-          <form class="d-none d-md-flex">
-               <input class="form-control me-2" type="text" placeholder="Tìm kiếm bài viết, sản phẩm">
-               <button class="btn btn-primary" type="button">
-                    <i class="fas fa-search"></i>
+               <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
+                    <span class="navbar-toggler-icon"></span>
                </button>
-          </form>
-          <div class="collapse navbar-collapse justify-content-end ml-5" id="collapsibleNavbar">
-               <form class="d-flex d-sm-none mt-3">
+               <form class="d-none d-md-flex">
                     <input class="form-control me-2" type="text" placeholder="Tìm kiếm bài viết, sản phẩm">
                     <button class="btn btn-primary" type="button">
                          <i class="fas fa-search"></i>
                     </button>
                </form>
-               <ul class="navbar-nav">
-                    <li class="nav-item">
-                         <a class="nav-link" href="/">
-                              <i class="fas fa-home"></i>
-                              Forum
-                         </a>
-                    </li>
-                    <li class="nav-item">
-                         <a class="nav-link" href="#">
-                              <i class="fa-solid fa-shop"></i>
-                              Cửa Hàng
-                         </a>
-                    </li>
+               <div class="collapse navbar-collapse justify-content-end ml-5" id="collapsibleNavbar">
+                    <form class="d-flex d-sm-none mt-3">
+                         <input class="form-control me-2" type="text" placeholder="Tìm kiếm bài viết, sản phẩm">
+                         <button class="btn btn-primary" type="button">
+                              <i class="fas fa-search"></i>
+                         </button>
+                    </form>
+                    <ul class="navbar-nav">
+                         <li class="nav-item">
+                              <a class="nav-link" href="/">
+                                   <i class="fas fa-home"></i>
+                                   Forum
+                              </a>
+                         </li>
+                         <li class="nav-item">
+                              <a class="nav-link" href="#">
+                                   <i class="fa-solid fa-shop"></i>
+                                   Cửa Hàng
+                              </a>
+                         </li>
 
-                    <li class="nav-item dropdown">
-                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                              <i class="fas fa-user"></i> <?= $user->username ?? "Tài khoản" ?>
-                         </a>
-                         <ul class="dropdown-menu">
-                              <?php if ($user) : ?>
+                         <li class="nav-item dropdown">
+                              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                   <i class="fas fa-user"></i> <?= $user->username ?? "Tài khoản" ?>
+                              </a>
+                              <ul class="dropdown-menu">
+                                   <?php if ($user) : ?>
 
-                              <li><span class="dropdown-item" href="#">{!! $user->getRoles() !!}</span></li>
-                              @if ($user->checkRole("mod"))
+                                   <li><span class="dropdown-item" href="#">{!! $user->getRoles() !!}</span></li>
+                                   @if ($user->checkRole("mod"))
+                                        <hr>
+                                        <li>
+                                             <a class="dropdown-item text-danger" style="font-weight: bold" href="{{ route("dashboard") }}">
+                                                  <i class="fas fa-tachometer-alt me-2"></i>
+                                                  Dashboard
+                                             </a>
+                                        </li>
+                                   @endif
                                    <hr>
                                    <li>
-                                        <a class="dropdown-item text-danger" style="font-weight: bold" href="{{ route("dashboard") }}">
-                                             <i class="fas fa-tachometer-alt me-2"></i>
-                                             Dashboard
+                                        <a class="dropdown-item" href="/profile">
+                                             <i class="fas fa-user me-2"></i>
+                                             Hồ sơ
                                         </a>
                                    </li>
-                              @endif
-                              <hr>
-                              <li>
-                                   <a class="dropdown-item" href="/profile">
-                                        <i class="fas fa-user me-2"></i>
-                                        Hồ sơ
-                                   </a>
-                              </li>
-                              <li>
-                                   <a class="dropdown-item" href="/logout">
-                                        <i class="fas fa-sign-out-alt"></i>
-                                        Đăng xuất
-                                   </a>
-                              </li>
-                              <?php else : ?>
-                              <li>
-                                   <a class="dropdown-item" href="/login">
-                                        <i class="fas fa-sign-in-alt"></i>
-                                        Đăng nhập</a>
-                              </li>
-                              <li>
-                                   <a class="dropdown-item" href="/register">
-                                        <i class="fas fa-user-plus"></i>
-                                        Đăng ký
-                                   </a>
-                              </li>
-                              <?php endif; ?>
-                         </ul>
-                    </li>
-                    <li class="nav-item">
-                         <a class="nav-link" href="/">
-                              <i class="fa-solid fa-cart-shopping"></i>
-                              Giỏ hàng
-                         </a>
-                    </li>
-               </ul>
+                                   <li>
+                                        <a class="dropdown-item" href="/logout">
+                                             <i class="fas fa-sign-out-alt"></i>
+                                             Đăng xuất
+                                        </a>
+                                   </li>
+                                   <?php else : ?>
+                                   <li>
+                                        <a class="dropdown-item" href="/login">
+                                             <i class="fas fa-sign-in-alt"></i>
+                                             Đăng nhập</a>
+                                   </li>
+                                   <li>
+                                        <a class="dropdown-item" href="/register">
+                                             <i class="fas fa-user-plus"></i>
+                                             Đăng ký
+                                        </a>
+                                   </li>
+                                   <?php endif; ?>
+                              </ul>
+                         </li>
+                         <li class="nav-item">
+                              <a class="nav-link" href="/">
+                                   <i class="fa-solid fa-cart-shopping"></i>
+                                   Giỏ hàng
+                              </a>
+                         </li>
+                    </ul>
+               </div>
           </div>
-     </div>
-</nav>
+     </nav>
+@endif
+
 
 
 <div class="container" style="margin-top: 100px;"></div>
@@ -144,50 +149,52 @@ $backgroud_img = $backgroud_img ?? false;
 
 <body>
      @yield("content")
+     @if (!$hide_navbar)
+          <footer class="footer">
+               <div class="container">
 
-     <footer class="footer">
-          <div class="container">
+               </div>
+          </footer>
 
-          </div>
-     </footer>
+          <span href="#" id="toTopBtn" class="cd-top rounded-pill p-3" data-abc="true">
+               <i class="fa-solid fa-chevron-up"></i>
+          </span>
+          <style>
+               #toTopBtn {
+                    position: fixed;
+                    bottom: 26px;
+                    right: 39px;
+                    z-index: 98;
+                    /* padding: 21px; */
+                    background-color: hsla(5, 76%, 62%, .8);
 
-     <span href="#" id="toTopBtn" class="cd-top rounded-pill p-3" data-abc="true">
-          <i class="fa-solid fa-chevron-up"></i>
-     </span>
-     <style>
-          #toTopBtn {
-               position: fixed;
-               bottom: 26px;
-               right: 39px;
-               z-index: 98;
-               /* padding: 21px; */
-               background-color: hsla(5, 76%, 62%, .8);
+               }
 
-          }
+               /* hover cd top change cusor */
+               .cd-top:hover {
+                    cursor: pointer;
+               }
+          </style>
+          <script>
+               $(document).ready(function() {
+                    $(window).scroll(function() {
+                         if ($(this).scrollTop() > 50) {
+                              $('#toTopBtn').fadeIn();
+                         } else {
+                              $('#toTopBtn').fadeOut();
+                         }
+                    });
 
-          /* hover cd top change cusor */
-          .cd-top:hover {
-               cursor: pointer;
-          }
-     </style>
-     <script>
-          $(document).ready(function() {
-               $(window).scroll(function() {
-                    if ($(this).scrollTop() > 50) {
-                         $('#toTopBtn').fadeIn();
-                    } else {
-                         $('#toTopBtn').fadeOut();
-                    }
+                    $('#toTopBtn').click(function() {
+                         $("html, body").animate({
+                              scrollTop: 0
+                         }, 1000);
+                         return false;
+                    });
                });
+          </script>
+     @endif
 
-               $('#toTopBtn').click(function() {
-                    $("html, body").animate({
-                         scrollTop: 0
-                    }, 1000);
-                    return false;
-               });
-          });
-     </script>
 
 </body>
 

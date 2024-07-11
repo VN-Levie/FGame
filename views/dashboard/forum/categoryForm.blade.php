@@ -1,8 +1,14 @@
 @extends("layouts.app")
 @section("content")
-<div class="container">
+<div class="container-fluid">
      <main class="col-md-12 ml-sm-auto col-lg-12 px-md-4 py-4 p-3">
-          <h1 class="h2">{{ $category?->id ? 'Chỉnh sửa' : 'Tạo mới' }} danh mục</h1>
+          <nav aria-label="breadcrumb">
+               <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ route("dashboard") }}">Dashboard</a></li>
+                    <li class="breadcrumb-item" aria-current="page">Categories</li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ $category?->id ? 'Chỉnh sửa' : 'Tạo mới' }}</li>
+               </ol>
+          </nav>          
           <div class="row">
                <div class="col-12 col-xl-12 mb-4 mb-lg-0 mt-3">
                     <div class="card">

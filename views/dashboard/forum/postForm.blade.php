@@ -2,11 +2,18 @@
 @section("content")
 <div class="container">
      <main class="col-md-12 ml-sm-auto col-lg-12 px-md-4 py-4 p-3">
-          <h1 class="h2">Tạo bài viết </h1>
+          <nav aria-label="breadcrumb">
+               <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ route("dashboard") }}">Dashboard</a></li>
+                    <li class="breadcrumb-item" aria-current="page">Posts</li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ $post?->title ?? 'new' }}</li>
+                    {{-- <li class="breadcrumb-item active" aria-current="page">{{ $post?->id ? 'Chỉnh sửa' : 'Tạo mới' }}</li> --}}
+               </ol>
+          </nav>          
           <div class="row">
                <div class="col-12 col-xl-12 mb-4 mb-lg-0 mt-3">
                     <div class="card">
-                         <h5 class="card-header">Tạo bài viết mới</h5>
+                         <h5 class="card-header">{{ $post?->id ? 'Chỉnh sửa' : 'Tạo mới' }} bài viết</h5>
                          <div class="card-body">
                               <form method="POST" action="#" id="postSubmit">
                                    <input type="hidden" name="id" value="{{ $post?->id ?? null }}">

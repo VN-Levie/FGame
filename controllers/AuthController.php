@@ -10,7 +10,8 @@ class AuthController extends Controller
     {
         $data = [
             'title' => 'Đăng nhập',
-            'backgroud_img' => 'https://i.imgur.com/H5Ez361.jpg'
+            'backgroud_img' => 'https://i.imgur.com/H5Ez361.jpg',
+            'hide_navbar' => true
         ];
         $this->view('auth/login', $data);
     }
@@ -68,7 +69,8 @@ class AuthController extends Controller
     {
         $data = [
             'title' => 'Đăng ký',
-            'backgroud_img' => 'https://i.imgur.com/H5Ez361.jpg'
+            'backgroud_img' => 'https://i.imgur.com/H5Ez361.jpg',
+            'hide_navbar' => true
         ];
         $this->view('auth/register', $data);
     }

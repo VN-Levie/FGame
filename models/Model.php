@@ -32,14 +32,14 @@ class Model
     //all
     public static function all()
     {
-      try {
-        $stmt = self::$db->prepare('SELECT * FROM ' . static::getTableName());
-        $stmt->setFetchMode(PDO::FETCH_CLASS, get_called_class());
-        $stmt->execute();
-        return $stmt->fetchAll();
-      } catch (\Throwable $th) {
-        return View::abort(500, $th->getMessage());
-      }
+        try {
+            $stmt = self::$db->prepare('SELECT * FROM ' . static::getTableName());
+            $stmt->setFetchMode(PDO::FETCH_CLASS, get_called_class());
+            $stmt->execute();
+            return $stmt->fetchAll();
+        } catch (\Throwable $th) {
+            return View::abort(500, $th->getMessage());
+        }
     }
 
     public static function find($id)
@@ -254,10 +254,11 @@ class Model
     //toArray
     public function toArray()
     {
-        $props = get_object_vars($this);
-        unset($props['db']);
-        return $props;
+        $props = get_object_vars($this); // Lấy tất cả thuộc tính của đối tượng
+        unset($props['db']); // Loại bỏ thuộc tính 'db' khỏi mảng
+        return $props; // Trả về mảng kết hợp
     }
+
 
     //delete
     public function delete($conditions = [])

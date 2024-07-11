@@ -11,6 +11,8 @@ class ForumCategory extends Model
     public $id;
     public $name;
     public $description;
+    public $soft_delete = 0;
+    public $hide = 0;
     public $user_id;
     public $updated_at;
     public $created_at;

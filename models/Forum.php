@@ -11,8 +11,10 @@ class Forum extends Model
     public $category_id;
     public $title;
     public $content;
-    public $user_id;
     public $views;
+    public $soft_delete = 0;
+    public $hide = 0;
+    public $user_id;
     public $updated_at;
     public $created_at;
 
@@ -29,8 +31,8 @@ class Forum extends Model
 
     public static function countUpView($id)
     {
-        $stmt = self::$db->prepare('UPDATE forum SET views = views + 1 WHERE id = :id');
-        $stmt->bindParam(':id', $id);
-        return $stmt->execute();
+        $forum = self::find($id);
+        $forum->views += 1;
+        return $forum->save();
     }
 }

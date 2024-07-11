@@ -106,6 +106,90 @@ class ForumController extends Controller
         // header('Location: ' . route('dashboard.forum'));
     }
 
+    //delete post
+    public function postDelete()
+    {
+        global $user;
+        if (!$user) {
+            return $this->json([
+                'status' => 'error',
+                'message' => 'Vui lòng đăng nhập'
+            ]);
+        }
+        //check role 'mod'
+        if (!$user->checkRole("mod")) {
+            return $this->json([
+                'status' => 'error',
+                'message' => 'Bạn không có quyền'
+            ]);
+        }
+        $id = $_POST['id'] ?? null;
+        if ($id == null) {
+            return $this->json([
+                'status' => 'error',
+                'message' => 'Bài viết không tồn tại'
+            ]);
+        }
+        $post = Forum::find($id);
+        if (!$post) {
+            return $this->json([
+                'status' => 'error',
+                'message' => 'Bài viết không tồn tại'
+            ]);
+        }
+        if ($post->soft_delete && !$user->checkRole("admin")) {
+            return $this->json([
+                'status' => 'error',
+                'message' => 'Chỉ admin mới có thể khôi phục bài viết'
+            ]);
+        }
+        $post->soft_delete = abs($post->soft_delete - 1);
+        $post->save();
+        return $this->json([
+            'status' => 'success',
+            'message' => $post->soft_delete ? 'Xóa bài viết thành công' : 'Khôi phục bài viết thành công'
+        ]);
+    }
+
+    //post hide
+    public function postHide()
+    {
+        global $user;
+        if (!$user) {
+            return $this->json([
+                'status' => 'error',
+                'message' => 'Vui lòng đăng nhập'
+            ]);
+        }
+        //check role 'mod'
+        if (!$user->checkRole("mod")) {
+            return $this->json([
+                'status' => 'error',
+                'message' => 'Bạn không có quyền'
+            ]);
+        }
+        $id = $_POST['id'] ?? null;
+        if ($id == null) {
+            return $this->json([
+                'status' => 'error',
+                'message' => 'Bài viết không tồn tại'
+            ]);
+        }
+        $post = Forum::find($id);
+        if (!$post) {
+            return $this->json([
+                'status' => 'error',
+                'message' => 'Bài viết không tồn tại'
+            ]);
+        }
+        $post->hide = abs($post->hide - 1);
+        $post->save();
+        return $this->json([
+            'status' => 'success',
+            'message' => ($post->hide ? 'Khóa' : 'Mở'). '  bình luận bài viết thành công'
+        ]);
+    }
+
 
     public function categories()
     {
@@ -144,10 +228,10 @@ class ForumController extends Controller
             ]);
         }
         //check role 'mod'
-        if (!$user->checkRole("mod")) {
+        if (!$user->checkRole("admin")) {
             return $this->json([
                 'status' => 'error',
-                'message' => 'Bạn không có quyền'
+                'message' => 'Chỉ admin mới có thể tạo/sửa danh mục'
             ]);
         }
         $id = $_POST['id'] ?? null;
@@ -192,5 +276,89 @@ class ForumController extends Controller
         ]);
 
         // header('Location: ' . route('dashboard.forum'));
+    }
+
+    //delete category
+    public function categoryDelete()
+    {
+        global $user;
+        if (!$user) {
+            return $this->json([
+                'status' => 'error',
+                'message' => 'Vui lòng đăng nhập'
+            ]);
+        }
+        //check role 'mod'
+        if (!$user->checkRole("admin")) {
+            return $this->json([
+                'status' => 'error',
+                'message' => 'Bạn không có quyền'
+            ]);
+        }
+        $id = $_POST['id'] ?? null;
+        if ($id == null) {
+            return $this->json([
+                'status' => 'error',
+                'message' => 'Danh mục không tồn tại'
+            ]);
+        }
+        $category = ForumCategory::find($id);
+        if (!$category) {
+            return $this->json([
+                'status' => 'error',
+                'message' => 'Danh mục không tồn tại'
+            ]);
+        }
+        if ($category->soft_delete && !$user->checkRole("s-admin")) {
+            return $this->json([
+                'status' => 'error',
+                'message' => 'Chỉ s-admin mới có thể khôi phục danh mục'
+            ]);
+        }
+        $category->soft_delete = abs($category->soft_delete - 1);
+        $category->save();
+        return $this->json([
+            'status' => 'success',
+            'message' =>  $category->soft_delete ? 'Xóa danh mục thành công' : 'Khôi phục danh mục thành công'
+        ]);
+    }
+
+    //category hide
+    public function categoryHide()
+    {
+        global $user;
+        if (!$user) {
+            return $this->json([
+                'status' => 'error',
+                'message' => 'Vui lòng đăng nhập'
+            ]);
+        }
+        //check role 'mod'
+        if (!$user->checkRole("s-mod")) {
+            return $this->json([
+                'status' => 'error',
+                'message' => 'Chỉ s-mod mới có thể mở/khóa danh mục'
+            ]);
+        }
+        $id = $_POST['id'] ?? null;
+        if ($id == null) {
+            return $this->json([
+                'status' => 'error',
+                'message' => 'Danh mục không tồn tại'
+            ]);
+        }
+        $category = ForumCategory::find($id);
+        if (!$category) {
+            return $this->json([
+                'status' => 'error',
+                'message' => 'Danh mục không tồn tại'
+            ]);
+        }
+        $category->hide = abs($category->hide - 1);
+        $category->save();
+        return $this->json([
+            'status' => 'success',
+            'message' => ($category->hide ? 'Khóa' : 'Mở'). '  đăng bài viết mới trong danh mục thành công'
+        ]);
     }
 }

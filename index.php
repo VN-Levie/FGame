@@ -93,12 +93,21 @@ $route->prefix(
                 //post form
                 $route->get('/form-post', 'ForumController', 'postForm', $prefix)->name('dashboard.forum.form.post');
                 $route->post('/form-post', 'ForumController', 'postFormSubmit', $prefix)->name('dashboard.forum.post.submit');
+                //post delete
+                $route->post('/delete-post', 'ForumController', 'postDelete', $prefix)->name('dashboard.forum.post.delete.submit');
+                //post hide
+                $route->post('/hide-post', 'ForumController', 'postHide', $prefix)->name('dashboard.forum.post.hide.submit');
 
                 // categories
                 $route->get('/categories', 'ForumController', 'categories', $prefix)->name('dashboard.forum.categories');
                 //category form create/update
                 $route->get('/categories/form', 'ForumController', 'categoryForm', $prefix)->name('dashboard.forum.categories.form');
                 $route->post('/categories/form', 'ForumController', 'categoryFormSubmit', $prefix)->name('dashboard.forum.categories.form.submit');
+                //category delete
+                $route->post('/categories/delete', 'ForumController', 'categoryDelete', $prefix)->name('dashboard.forum.categories.delete.submit');
+                //category hide
+                $route->post('/categories/hide', 'ForumController', 'categoryHide', $prefix)->name('dashboard.forum.categories.hide.submit');
+
             }
         );
     }
