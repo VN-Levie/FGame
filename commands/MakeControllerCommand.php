@@ -14,7 +14,7 @@ class MakeControllerCommand
         global $argv;
 
         if (count($argv) < 3) {
-            echo "Usage: php artisan.php make:controller ControllerName\n";
+            echo "Usage: php artisan make:controller ControllerName\n";
             exit(1);
         }
 

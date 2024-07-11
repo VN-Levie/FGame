@@ -10,7 +10,7 @@
                          </h5>
                          <div class="card-body">
                               <h5 class="card-title">
-                                   {{ count($users) }}
+                                   {{ number_format($users) }}
                               </h5>
                               <p class="card-text">Last: {{ $last_user->username }}</p>
                               <!-- <p class="card-text text-success">18.2% increase since last month</p> -->
@@ -24,8 +24,8 @@
                               Diễn đàn
                          </h5>
                          <div class="card-body">
-                              <h5 class="card-title">{{ count($forums) }} posts</h5>
-                              <p class="card-text">Comments: <?= $comments ?></p>
+                              <h5 class="card-title">{{ number_format($forums) }} posts</h5>
+                              <p class="card-text">Comments: <?= number_format($comments) ?></p>
                               <!-- <p class="card-text text-success">4.6% increase since last month</p> -->
                          </div>
                     </div>
@@ -50,8 +50,8 @@
                               Traffic
                          </h5>
                          <div class="card-body">
-                              <h5 class="card-title">{{ $traffics }}</h5>
-                              <p class="card-text">Unique: {{ $traffics_unique }}</p>
+                              <h5 class="card-title">{{ number_format($traffics) }}</h5>
+                              <p class="card-text">Unique: {{ number_format($traffics_unique) }}</p>
                               <!-- <p class="card-text text-success">2.5% increase since last month</p> -->
                          </div>
                     </div>

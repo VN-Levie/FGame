@@ -9,12 +9,28 @@ class MakeModelCommand
         return 'make:model';
     }
 
+    // Get table name from model name
+    function getTableName($table_name)
+    {
+        // Thêm dấu _ giữa các từ
+        $table_name = preg_replace('/(?<!^)[A-Z]/', '_$0', $table_name);
+        // Kiểm tra quy tắc tiếng Anh
+        if (substr($table_name, -1) === 'y') {
+            $table_name = substr($table_name, 0, -1) . 'ies';
+        } else {
+            $table_name .= 's';
+        }
+        // Chuyển thành chữ thường
+        $table_name = strtolower($table_name);
+        return $table_name;
+    }
+
     public function execute()
     {
         global $argv;
 
         if (count($argv) < 3) {
-            echo "Usage: php artisan.php make:model ModelName\n";
+            echo "Usage: php artisan make:model [ModelName]\n";
             exit(1);
         }
 
@@ -31,13 +47,20 @@ class MakeModelCommand
             exit(1);
         }
 
+        $tableName = $this->getTableName($modelName);
+
         $template = <<<EOT
 <?php
 
 namespace Models;
 
+
 class $modelName extends Model
 {
+    public \$id;
+
+    protected static \$table = '$tableName';
+    
     // Your model code here
 }
 EOT;

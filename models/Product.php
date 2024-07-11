@@ -21,60 +21,6 @@ class Product extends Model
     public $updated_at;
     public $created_at;
 
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
-    public static function all()
-    {
-        $stmt = self::$db->prepare('SELECT * FROM products');
-        $stmt->setFetchMode(PDO::FETCH_CLASS, 'Models\Product');
-        $stmt->execute();
-        return $stmt->fetchAll();
-    }
-
-    public static function find($id): Product
-    {
-        $stmt = self::$db->prepare('SELECT * FROM products WHERE id = :id');
-        $stmt->bindParam(':id', $id);
-        $stmt->setFetchMode(PDO::FETCH_CLASS, 'Models\Product');
-        $stmt->execute();
-        return $stmt->fetch();
-    }
-
-
-    public function save()
-    {
-        if ($this->id) {
-            return $this->update(['Product', 'products'],$this->id, $this->toArray());
-        }
-        return $this->create(['Product', 'products'],$this->toArray());
-    }
-
-    public function delete()
-    {
-        $stmt = self::$db->prepare('DELETE FROM products WHERE id = :id');
-        $stmt->bindParam(':id', $this->id);
-        return $stmt->execute();
-    }
-
-    public function toArray()
-    {
-        return [
-            'name' => $this->name,
-            'description' => $this->description,
-            'price' => $this->price,
-            'stock' => $this->stock,
-            'category_id' => $this->category_id,
-            'status' => $this->status,
-            'pinned' => $this->pinned,
-            'views' => $this->views,
-            'is_digital' => $this->is_digital,
-            'digital_info' => $this->digital_info,
-            'digital_template_id' => $this->digital_template_id
-        ];
-    }
 
     public static function countUpView($id)
     {

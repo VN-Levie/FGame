@@ -6,6 +6,8 @@ use PDO;
 
 class Traffic extends Model
 {
+    protected static $table = 'traffics';
+
     public $id;
     public $ip;
     public $user_agent;
@@ -14,47 +16,16 @@ class Traffic extends Model
     public $updated_at;
     public $created_at;
 
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
-    public static function all()
-    {
-        $stmt = self::$db->prepare('SELECT * FROM traffic');
-        $stmt->setFetchMode(PDO::FETCH_CLASS, 'Models\Traffic');
-        $stmt->execute();
-        return $stmt->fetchAll();
-    }
-
-    public static function find($id): Traffic
-    {
-        $stmt = self::$db->prepare('SELECT * FROM traffic WHERE id = :id');
-        $stmt->bindParam(':id', $id);
-        $stmt->setFetchMode(PDO::FETCH_CLASS, 'Models\Traffic');
-        $stmt->execute();
-        return $stmt->fetch();
-    }
-
 
 
     public static function checkAndCountUpOrInsert($ip, $user_agent, $user_id)
     {
-        // Kiểm tra nếu IP đã tồn tại và user_id giống nhau
-        $stmt = self::$db->prepare('SELECT * FROM traffic WHERE ip = :ip AND user_id = :user_id and user_agent = :user_agent');
-        $stmt->bindParam(':ip', $ip);
-        $stmt->bindParam(':user_id', $user_id);
-        $stmt->bindParam(':user_agent', $user_agent);
-        $stmt->setFetchMode(PDO::FETCH_CLASS, 'Models\Traffic');
-        $stmt->execute();
-        $traffic = $stmt->fetch();
 
+        $traffic = Traffic::findOne(['ip' => $ip, 'user_id' => $user_id, 'user_agent' => $user_agent]);
         if ($traffic) {
-            // Nếu tồn tại, tăng biến đếm lên
-            $stmt = self::$db->prepare('UPDATE traffic SET count_up = count_up + 1, user_agent = :user_agent WHERE id = :id');
-            $stmt->bindParam(':id', $traffic->id);
-            $stmt->bindParam(':user_agent', $user_agent);
-            return $stmt->execute();
+
+            $traffic->count_up++;
+            return $traffic->save();
         } else {
             // Nếu không tồn tại, hoặc tồn tại nhưng user_id khác, chèn mới
             $data = [
@@ -63,56 +34,15 @@ class Traffic extends Model
                 'user_id' => $user_id,
                 'count_up' => 1
             ];
-            return self::create(['Traffic', 'traffic'], $data);
+            return self::create($data);
         }
     }
 
-    //last
-    public static function last()
-    {
-        $stmt = self::$db->prepare('SELECT * FROM traffic ORDER BY id DESC LIMIT 1');
-        $stmt->setFetchMode(PDO::FETCH_CLASS, 'Models\Traffic');
-        $stmt->execute();
-        return $stmt->fetch();
-    }
+    
 
-    public function save()
-    {
-        if ($this->id) {
-            return $this->update(['Traffic', 'traffic'], $this->id, $this->toArray());
-        }
-        return $this->create($this->toArray());
-    }
 
-    public function delete()
-    {
-        $stmt = self::$db->prepare('DELETE FROM traffic WHERE id = :id');
-        $stmt->bindParam(':id', $this->id);
-        return $stmt->execute();
-    }
 
-    public function toArray()
-    {
-        return [
-            'ip' => $this->ip,
-            'user_agent' => $this->user_agent,
-            'user_id' => $this->user_id,
-            'count_up' => $this->count_up
-        ];
-    }
 
-    public static function count($column, $operator = '=', $value = null)
-    {
-        $stmt = self::$db->prepare("SELECT COUNT(*) FROM traffic WHERE $column $operator :value");
-        $stmt->bindParam(':value', $value);
-        $stmt->execute();
-        return $stmt->fetchColumn();
-    }
 
-    public static function sum($column, $condition = null)
-    {
-        $stmt = self::$db->prepare("SELECT SUM($column) FROM traffic $condition");
-        $stmt->execute();
-        return $stmt->fetchColumn();
-    }
+
 }

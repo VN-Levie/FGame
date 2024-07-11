@@ -14,7 +14,7 @@ class MakeViewCommand
         global $argv;
 
         if (count($argv) < 3) {
-            echo "Usage: php artisan.php make:view dir/viewName\n";
+            echo "Usage: php artisan make:view dir/viewName\n";
             exit(1);
         }
 

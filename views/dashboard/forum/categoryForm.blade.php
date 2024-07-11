@@ -55,11 +55,11 @@
                     var form = e.target;
                     var data = new FormData(form);
                     var content = CKEDITOR.instances.content.getData();
-                    data.append('content', content);
+                    data.append('description', content);
                     $("#submit").text("Đợi tý...");
                     $('#submit').prop('disabled', true);
                     $.ajax({
-                         url: "{{ route("dashboard.forum.post.submit") }}",
+                         url: "{{ route("dashboard.forum.categories.form.submit") }}",
                          method: "POST",
                          processData: false,
                          contentType: false,

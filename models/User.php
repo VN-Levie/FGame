@@ -11,71 +11,10 @@ class User extends Model
     public $username;
     public $password;
     public $roles;
+    public $baned = 0;
     public $email;
     public $updated_at;
     public $created_at;
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
-    public static function all()
-    {
-        $stmt = self::$db->prepare('SELECT * FROM users');
-        $stmt->setFetchMode(PDO::FETCH_CLASS, 'Models\User');
-        $stmt->execute();
-        return $stmt->fetchAll();
-    }
-
-    public static function find($id): User
-    {
-        $stmt = self::$db->prepare('SELECT * FROM users WHERE id = :id');
-        $stmt->bindParam(':id', $id);
-        $stmt->setFetchMode(PDO::FETCH_CLASS, 'Models\User');
-        $stmt->execute();
-        return $stmt->fetch();
-    }
-
-
-    public static function where($column, $operator = '=', $value = null)
-    {
-        $stmt = self::$db->prepare("SELECT * FROM users WHERE $column $operator :value");
-        $stmt->bindParam(':value', $value);
-        $stmt->setFetchMode(PDO::FETCH_CLASS, 'Models\User');
-        $stmt->execute();
-        return $stmt->fetchAll();
-    }
-
-    public static function count($column, $operator = '=', $value = null)
-    {
-        $stmt = self::$db->prepare("SELECT COUNT(*) FROM users WHERE $column $operator :value");
-        $stmt->bindParam(':value', $value);
-        $stmt->execute();
-        return $stmt->fetchColumn();
-    }
-    public static function last()
-    {
-        $stmt = self::$db->prepare('SELECT * FROM users ORDER BY id DESC LIMIT 1');
-        $stmt->setFetchMode(PDO::FETCH_CLASS, 'Models\User');
-        $stmt->execute();
-        return $stmt->fetch();
-    }
-
-
-    public function  save()
-    {
-        if ($this->id) {
-            return $this->update(['User', 'users'], $this->id, $this->toArray());
-        }
-        return $this->create($this->toArray());
-    }
-
-    public function delete()
-    {
-        $stmt = self::$db->prepare('DELETE FROM users WHERE id = :id');
-        $stmt->bindParam(':id', $this->id);
-        return $stmt->execute();
-    }
 
     //get user by username
     public static function getByUsername($username)
@@ -91,15 +30,7 @@ class User extends Model
 
 
 
-    public function toArray()
-    {
-        return [
-            'username' => $this->username,
-            'password' => $this->password,
-            'roles' => $this->roles,
-            'email' => $this->email
-        ];
-    }
+
 
     //get roles
     public function getRoles()

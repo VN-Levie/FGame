@@ -8,6 +8,7 @@ use PDO;
 class Model
 {
     protected static $db;
+    public $id;
 
     protected static $table;
 
@@ -17,6 +18,15 @@ class Model
             $database = new Database();
             self::$db = $database->connect();
         }
+    }
+
+    //all
+    public static function all()
+    {
+        $stmt = self::$db->prepare('SELECT * FROM ' . static::getTableName());
+        $stmt->setFetchMode(PDO::FETCH_CLASS, get_called_class());
+        $stmt->execute();
+        return $stmt->fetchAll();
     }
 
     public static function find($id)
@@ -67,7 +77,7 @@ class Model
         $prop_name = preg_replace('/(?<!^)[A-Z]/', '_$0', $prop_name);
         //chuyển thành chữ thường
         $prop_name = strtolower($prop_name);
-         //loại bỏ s hoăc es ở cuối theo quy tắc tiếng anh
+        //loại bỏ s hoăc es ở cuối theo quy tắc tiếng anh
         if (substr($prop_name, -3) === 'ies') {
             $prop_name = substr($prop_name, 0, -3) . 'y';
         } else if (substr($prop_name, -1) === 's') {
@@ -87,13 +97,62 @@ class Model
         return $stmt->fetchAll();
     }
 
+    //find with condition
+    public static function findWhere($conditions)
+    {
+        $table_name = static::getTableName();
+        $sql = "SELECT * FROM $table_name WHERE ";
+        $where = [];
+        foreach ($conditions as $key => $value) {
+            $where[] = "$key = :$key";
+        }
+        $sql .= implode(" AND ", $where);
+        $stmt = self::$db->prepare($sql);
+        $stmt->setFetchMode(PDO::FETCH_CLASS, get_called_class());
+        $stmt->execute($conditions);
+        return $stmt->fetchAll();
+    }
+
+    //findone
+    public static function findOne($conditions)
+    {
+        $table_name = static::getTableName();
+        $sql = "SELECT * FROM $table_name WHERE ";
+        $where = [];
+        foreach ($conditions as $key => $value) {
+            $where[] = "$key = :$key";
+        }
+        $sql .= implode(" AND ", $where);
+        $stmt = self::$db->prepare($sql);
+        $stmt->setFetchMode(PDO::FETCH_CLASS, get_called_class());
+        $stmt->execute($conditions);
+        return $stmt->fetch();
+    }
+
+    //first
+    public static function first()
+    {
+        $stmt = self::$db->prepare('SELECT * FROM ' . static::getTableName() . ' LIMIT 1');
+        $stmt->setFetchMode(PDO::FETCH_CLASS, get_called_class());
+        $stmt->execute();
+        return $stmt->fetch();
+    }
+
+    //last
+    public static function last()
+    {
+        $stmt = self::$db->prepare('SELECT * FROM ' . static::getTableName() . ' ORDER BY id DESC LIMIT 1');
+        $stmt->setFetchMode(PDO::FETCH_CLASS, get_called_class());
+        $stmt->execute();
+        return $stmt->fetch();
+    }
+
 
     public static function update($id, $data)
     {
         $model_name = get_called_class();
         $table_name =  static::getTableName();
-        $model_fullPath = "Models\\" . $model_name;
-        $instance = new $model_fullPath();
+        $instance = new $model_name();
         $props = array_keys(get_object_vars($instance));
         $sql = "UPDATE $table_name SET ";
         foreach ($props as $prop) {
@@ -178,10 +237,192 @@ class Model
         }
         return $instance;
     }
+
+    //toArray
+    public function toArray()
+    {
+        $props = get_object_vars($this);
+        unset($props['db']);
+        return $props;
+    }
+
+    //delete
+    public function delete($conditions = [])
+    {
+        $table_name = static::getTableName();
+
+        if (empty($conditions)) {
+            if (!isset($this->id)) {
+                throw new \Exception("Table <strong>'{$table_name}'</strong> must have a primary key to delete.");
+            }
+            $conditions = ['id' => $this->id];
+        }
+
+        $whereClause = [];
+        foreach (array_keys($conditions) as $key) {
+            $whereClause[] = "$key = :$key";
+        }
+        $whereClause = implode(' AND ', $whereClause);
+
+        $stmt = self::$db->prepare("DELETE FROM $table_name WHERE $whereClause");
+
+        foreach ($conditions as $key => $value) {
+            $stmt->bindValue(":$key", $value);
+        }
+
+        return $stmt->execute();
+    }
+
+    public function save()
+    {
+        if ($this->id) {
+            return $this->update($this->id, $this->toArray());
+        }
+        return $this->create($this->toArray());
+    }
+
+    public static function sum($column, $condition = [])
+    {
+        $table_name = static::getTableName();
+        $sql = "SELECT SUM($column) FROM $table_name";
+        if (!empty($condition)) {
+            $where = [];
+            foreach ($condition as $key => $value) {
+                $where[] = "$key = :$key";
+            }
+            $sql .= " WHERE " . implode(" AND ", $where);
+        }
+        $stmt = self::$db->prepare($sql);
+        $stmt->execute($condition);
+        return $stmt->fetchColumn();
+    }
+
+    public static function count($condition = [])
+    {
+        $table_name = static::getTableName();
+        $sql = "SELECT COUNT(*) FROM $table_name";
+        if (!empty($condition)) {
+            $where = [];
+            foreach ($condition as $key => $value) {
+                $where[] = "$key = :$key";
+            }
+            $sql .= " WHERE " . implode(" AND ", $where);
+        }
+        $stmt = self::$db->prepare($sql);
+        $stmt->execute($condition);
+        return $stmt->fetchColumn();
+    }
+
+    //min
+    public static function min($column, $condition = [])
+    {
+        $table_name = static::getTableName();
+        $sql = "SELECT MIN($column) FROM $table_name";
+        if (!empty($condition)) {
+            $where = [];
+            foreach ($condition as $key => $value) {
+                $where[] = "$key = :$key";
+            }
+            $sql .= " WHERE " . implode(" AND ", $where);
+        }
+        $stmt = self::$db->prepare($sql);
+        $stmt->execute($condition);
+        return $stmt->fetchColumn();
+    }
+
+    //max
+    public static function max($column, $condition = [])
+    {
+        $table_name = static::getTableName();
+        $sql = "SELECT MAX($column) FROM $table_name";
+        if (!empty($condition)) {
+            $where = [];
+            foreach ($condition as $key => $value) {
+                $where[] = "$key = :$key";
+            }
+            $sql .= " WHERE " . implode(" AND ", $where);
+        }
+        $stmt = self::$db->prepare($sql);
+        $stmt->execute($condition);
+        return $stmt->fetchColumn();
+    }
+
+    //avg
+    public static function avg($column, $condition = [])
+    {
+        $table_name = static::getTableName();
+        $sql = "SELECT AVG($column) FROM $table_name";
+        if (!empty($condition)) {
+            $where = [];
+            foreach ($condition as $key => $value) {
+                $where[] = "$key = :$key";
+            }
+            $sql .= " WHERE " . implode(" AND ", $where);
+        }
+        $stmt = self::$db->prepare($sql);
+        $stmt->execute($condition);
+        return $stmt->fetchColumn();
+    }
+
+    //raw
+    public static function raw($sql, $condition = [])
+    {
+        $table_name = static::getTableName();
+        $sql = "SELECT * FROM $table_name";
+        $stmt = self::$db->prepare($sql);
+        $stmt->execute($condition);
+        return $stmt->fetchAll();
+    }
+
+    //random
+    public static function random($limit = 1)
+    {
+        $table_name = static::getTableName();
+        $sql = "SELECT * FROM $table_name ORDER BY RAND() LIMIT $limit";
+        $stmt = self::$db->prepare($sql);
+        $stmt->setFetchMode(PDO::FETCH_CLASS, get_called_class());
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    /**
+     * Select records from the database.
+     *
+     * @param array $columns The columns to select. If empty, selects all columns.
+     * @param array $condition An associative array of conditions where the key is the column name and the value is the value to filter by.
+     * @return array An array of objects representing the selected records.
+     * @throws \Exception If there is an error in the SQL execution.
+     */
+    public static function select($columns = [], $condition = [])
+    {
+        $table_name = static::getTableName();
+        $sql = "SELECT ";
+        if (empty($columns)) {
+            $sql .= "*";
+        } else {
+            $sql .= implode(", ", $columns);
+        }
+        $sql .= " FROM $table_name";
+        if (!empty($condition)) {
+            $where = [];
+            foreach ($condition as $key => $value) {
+                $where[] = "$key = :$key";
+            }
+            $sql .= " WHERE " . implode(" AND ", $where);
+        }
+        $stmt = self::$db->prepare($sql);
+        $stmt->setFetchMode(PDO::FETCH_CLASS, get_called_class());
+
+        $stmt->execute($condition);
+        return $stmt->fetchAll();
+    }
+
+
+
     /**
      * Thực hiện eager loading dữ liệu từ các bảng liên quan.
      *     
-     * @param array $dependents Thông tin về các model và bảng phụ thuộc, dạng mảng các mảng. `[['ModelName', 'column_dependent', 'dependent_name'], ...]`.
+     * @param array $dependents Thông tin về các model và bảng phụ thuộc, dạng mảng các mảng. `[ ...]`.
      * @param array $conditions Điều kiện truy vấn WHERE, dạng mảng `key`-`value`.
      * @param int $limit Giới hạn số lượng bản ghi, mặc định là `-1` (không giới hạn).
      * @param int $page Trang hiện tại để phân trang, mặc định là `1`.

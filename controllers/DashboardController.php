@@ -13,15 +13,15 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        $forums = Forum::all();
-        $comments = count(ForumComment::all());
-        $game_categories = GameCategory::all();
-        $games = Game::all();
-        $users = User::all();
+        $forums = Forum::count();
+        $comments = ForumComment::count();
+        $game_categories = GameCategory::count();
+        $games = Game::count();
+        $users = User::count();
         $last_user = User::last();
         $sum_total = Order::sum('total');
         $traffics = Traffic::sum('count_up');
-        $traffics_unique = count(Traffic::all());
+        $traffics_unique = Traffic::count();
         $oders = Order::whereWiths([['Product'], ['User']]);
         // print_r($oders);
         $data = [
