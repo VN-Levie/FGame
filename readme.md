@@ -333,10 +333,10 @@ Script [`artisan`] cung cấp giao diện dòng lệnh để thực hiện các 
 
 1. Clone repository:
    ```sh
-   git clone https://github.com/vn-levie/fgame.git
+   git clone [https://github.com/vn-levie/fgame.git](https://github.com/VN-Levie/FGame.git)
    ```
 
-2. Cấu hình cơ sở dữ liệu trong file `config/config.php`.
+2. Cấu hình cơ sở dữ liệu trong file `Core/Database.php`.
 
 3. Chạy các lệnh SQL để tạo bảng và dữ liệu ban đầu trong cơ sở dữ liệu của bạn.
 
