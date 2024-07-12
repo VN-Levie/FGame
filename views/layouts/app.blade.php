@@ -66,7 +66,7 @@ $hide_navbar ??= false;
                               </a>
                          </li>
                          <li class="nav-item">
-                              <a class="nav-link" href="#">
+                              <a class="nav-link" href="{{ route("shop.index") }}">
                                    <i class="fa-solid fa-shop"></i>
                                    Cửa Hàng
                               </a>
@@ -74,13 +74,13 @@ $hide_navbar ??= false;
 
                          <li class="nav-item dropdown">
                               <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                                   <i class="fas fa-user"></i> <?= $user->username ?? "Tài khoản" ?>
+                                   <i class="fas fa-user"></i> {!! $user?->username ? $user->getName() : "Tài khoản" !!} 
                               </a>
                               <ul class="dropdown-menu">
                                    <?php if ($user) : ?>
 
                                    <li><span class="dropdown-item" href="#">{!! $user->getRoles() !!}</span></li>
-                                   @if ($user->checkRole("mod"))
+                                   @if ($user->checkRole("seller"))
                                         <hr>
                                         <li>
                                              <a class="dropdown-item text-danger" style="font-weight: bold" href="{{ route("dashboard") }}">

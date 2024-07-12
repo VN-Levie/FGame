@@ -15,6 +15,7 @@ define('DOMAIN', (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'http
 require_once 'core/View.php';
 require_once 'core/Route.php';
 require_once 'core/Database.php';
+require_once 'core/Helper.php';
 
 
 //thực hiện load các Controller
@@ -35,6 +36,9 @@ require_once 'models/Traffic.php';
 require_once 'models/Product.php';
 require_once 'models/ForumCategory.php';
 require_once 'models/ForumComment.php';
+require_once 'models/PaymentMethod.php';
+require_once 'models/CustomerAddress.php';
+require_once 'models/ProductCategory.php';
 
 
 //Bắt đầu session
@@ -54,7 +58,14 @@ $model->openConnection();
 // Lấy người dùng từ session nếu có
 
 $user = isset($_SESSION['user']) ? User::find($_SESSION['user']->id) : null;
-
+if ($user && ($user->baned || $user->soft_delete)) {
+    // $user->role = 0;
+    // $user->save();
+    unset($_SESSION['user']);
+    //redirect to home
+    header('Location: /login');
+    exit();
+}
 //Kiểm tra traffic
 $ip = $_SERVER['REMOTE_ADDR'] ?? null;
 $user_agent = $_SERVER['HTTP_USER_AGENT'] ?? null;
@@ -65,6 +76,7 @@ $traffic = Traffic::checkAndCountUpOrInsert($ip, $user_agent, $user?->id ?? -1);
 $route = new Route();
 //register route with get method
 $route->get('/', 'HomeController', 'index')->name('home');
+$route->get('/home', 'HomeController', 'index')->name('home.2');
 //login
 $route->get('/login', 'AuthController', 'login')->name('login');
 $route->post('/login', 'AuthController', 'doLogin')->name('login.submit');
@@ -77,8 +89,29 @@ $route->post('/register', 'AuthController', 'doRegister')->name('register.submit
 $route->get('/profile', 'AuthController', 'profile')->name('user.profile');
 //change password
 $route->post('/change-password', 'AuthController', 'doChangePassword')->name('user.change-password.submit');
+$route->prefix(
+    '/forum',
+    function ($route, $prefix) {
+        $route->get('/detail', 'HomeController', 'detail', $prefix)->name('forum.detail');
+        // home.forum.comment.submit
+        $route->post('/comment', 'HomeController', 'commentSubmit', $prefix)->name('forum.comment.submit');
+        //đăng bài
+        $route->get('/post', 'HomeController', 'postForm', $prefix)->name('forum.post');
+        $route->post('/post', 'HomeController', 'postFormSubmit', $prefix)->name('forum.post.submit');
+        
+    }
+);
+$route->prefix(
+    '/shop',
+    function ($route, $prefix) {
+        $route->get('/', 'HomeController', 'shop', $prefix)->name('shop.index');
+        $route->get('/detail', 'HomeController', 'shopDetail', $prefix)->name('shop.detail');
+        //buy
+        $route->get('/buy', 'HomeController', 'buy', $prefix)->name('shop.buy');
+        $route->post('/buy', 'HomeController', 'buySubmit', $prefix)->name('shop.buy.submit');
 
-
+    }
+);
 //dashboard
 // $route->get('/dashboard', 'DashboardController', 'index');
 $route->prefix(
@@ -107,9 +140,36 @@ $route->prefix(
                 $route->post('/categories/delete', 'ForumController', 'categoryDelete', $prefix)->name('dashboard.forum.categories.delete.submit');
                 //category hide
                 $route->post('/categories/hide', 'ForumController', 'categoryHide', $prefix)->name('dashboard.forum.categories.hide.submit');
-
             }
         );
+        //user
+        $route->prefix(
+            '/dashboard/user',
+            function ($route, $prefix) {
+                $route->get('/', 'DashboardController', 'users', $prefix)->name('dashboard.users');
+                //user delete
+                $route->post('/delete', 'DashboardController', 'userDelete', $prefix)->name('dashboard.users.delete.submit');
+                //user ban
+                $route->post('/ban', 'DashboardController', 'userBan', $prefix)->name('dashboard.users.ban.submit');
+                //change role
+                $route->post('/change-role', 'DashboardController', 'userChangeRole', $prefix)->name('dashboard.users.change-role.submit');
+            }
+        );
+        // //product
+        // $route->prefix(
+        //     '/dashboard/product',
+        //     function ($route, $prefix) {
+        //         $route->get('/', 'DashboardController', 'products', $prefix)->name('dashboard.products');
+        //         //product form create/update
+        //         $route->get('/form', 'DashboardController', 'productForm', $prefix)->name('dashboard.products.form');
+        //         $route->post('/form', 'DashboardController', 'productFormSubmit', $prefix)->name('dashboard.products.form.submit');
+        //         //product delete
+        //         $route->post('/delete', 'DashboardController', 'productDelete', $prefix)->name('dashboard.products.delete.submit');
+        //         //product hide
+        //         $route->post('/hide', 'DashboardController', 'productHide', $prefix)->name('dashboard.products.hide.submit');
+
+        //     }
+        // );
     }
 );
 //register route with post method

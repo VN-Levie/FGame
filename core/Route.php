@@ -104,8 +104,12 @@ class Route
     }
 
     //get route url bằng name và bind các tham số
-    public  function route($name, $params = [])
+    public  function route($name = null, $params = []) : string
     {
+        //nếu $routeName = null thì trả về url hiện tại và bỏ / ở cuối
+        if (!$name) {
+            return rtrim(DOMAIN . $_SERVER['REQUEST_URI'], '/');
+        }
         // echo '123' . $name . '<br>';
         $routes = $this->routes['GET'];
         $found = false;

@@ -34,7 +34,7 @@ class MakeControllerCommand
         $template = <<<EOT
 <?php
 
-namespace Controllers;
+use Controllers\Controller;
 
 class $controllerName extends Controller
 {

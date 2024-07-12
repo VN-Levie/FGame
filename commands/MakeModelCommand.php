@@ -57,10 +57,11 @@ namespace Models;
 
 class $modelName extends Model
 {
-    public \$id;
 
     protected static \$table = '$tableName';
-    
+
+    public \$id;
+
     // Your model code here
 }
 EOT;

@@ -47,7 +47,7 @@
                          <div class="card-body">
                               <img src="/assets/images/logo.png" alt="Profile Image">
                               <h5>
-                                   <?= $user->username ?>
+                                   {!! $user->getName() !!}
                                    <a href="/edit-profile" class="btn-link">
                                         <i class="fa-solid fa-pen-to-square"></i>
                                    </a>
@@ -55,25 +55,34 @@
                               <p>
                                    {!! $user->getRoles() !!}
                               </p>
-                              <p>Là thành viên của Fgame từ ngày <?= date("d/m/Y", strtotime($user->created_at)) ?></p>
+
+                              <p>Là thành viên của Fgame từ ngày {{ date("d/m/Y", strtotime($user->created_at)) }}</p>
+
+                              <a href="#"><i class="fab fa-facebook-f me-3"></i></a>
+                              <a href="#"><i class="fab fa-twitter me-3"></i></a>
+                              <a href="#"><i class="fab fa-linkedin-in me-3"></i></a>
+                              <a href="#"><i class="fab fa-github me-3"></i></a>
+
+
                          </div>
                          <div class="card-footer text-center">
                               <!-- đăng xuất/đổi mật khẩu/giỏ hàng/quầy hàng/hóa đơn/dashboard/sổ đại chỉ/edit -->
-                              <?php if ($user->checkRole('mod')) : ?>
-                              <a href="/dashboard" class="btn btn-dark">
-                                   <i class="fas fa-tachometer-alt me-2"></i>
-                                   Dashboard
-                              </a>
-                              <hr>
-                              <?php endif; ?>
-                              <?php if ($user->checkRole('seller')) : ?>
+                              @if ($user->checkRole("mod"))
+                                   <a href="{{ route("dashboard") }}" class="btn btn-dark">
+                                        <i class="fas fa-tachometer-alt me-2"></i>
+                                        Dashboard
+                                   </a>
+                                   <hr>
+                              @endif
 
-                              <a href="/shop" class="btn btn-info">
-                                   <i class="fas fa-store me-2"></i>
-                                   Quầy hàng
-                              </a>
-                              <hr>
-                              <?php endif; ?>
+                              @if ($user->checkRole("seller"))
+                                   <a href="/shop" class="btn btn-info">
+                                        <i class="fas fa-store me-2"></i>
+                                        Quầy hàng
+                                   </a>
+                                   <hr>
+                              @endif
+
 
                               <a href="#" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#changePasswordModal">
                                    <i class="fas fa-key me-2"></i>
@@ -84,9 +93,9 @@
                                    Sổ địa chỉ
                               </a>
                               <!-- <a href="/edit-profile" class="btn btn-info">
-                             <i class="fas fa-user-edit me-2"></i>
-                             Edit
-                         </a> -->
+                                                      <i class="fas fa-user-edit me-2"></i>
+                                                      Edit
+                                                  </a> -->
                               <a href="/cart" class="btn btn-success">
                                    <i class="fas fa-shopping-cart me-2"></i>
                                    Giỏ hàng
@@ -102,10 +111,7 @@
                               <hr>
 
 
-                              <!-- <a href="#"><i class="fab fa-facebook-f"></i></a>
-                         <a href="#"><i class="fab fa-twitter"></i></a>
-                         <a href="#"><i class="fab fa-linkedin-in"></i></a>
-                         <a href="#"><i class="fab fa-github"></i></a> -->
+
                          </div>
                     </div>
                </div>

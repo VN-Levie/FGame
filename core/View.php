@@ -11,7 +11,7 @@ class View
     public static function render($path, $data = [])
     {
         try {
-            global $user, $route;            
+            global $user, $route;
             $data[] = $user;
             extract($data);
 
@@ -44,7 +44,7 @@ class View
         } catch (\Throwable $th) {
             $hide_header = true;
             self::renderError($th);
-        //   return  self::abort(500, $th);
+            //   return  self::abort(500, $th);
         }
     }
     // renderPartial
@@ -70,7 +70,9 @@ class View
     private static function template($text, $path = null)
     {
         global $user, $route;
-        $cache_name = md5($text);
+        // $cache_name = md5($text);
+
+        $cache_name = $path ?? md5($text);
         $cache_file = 'cache/views/' . $cache_name . '.php';
         if (CAHCE_VIEW) {
             if (file_exists($cache_file)) {
@@ -80,6 +82,7 @@ class View
 
         // Route
         $text = preg_replace('/route\((.+?)\)/', '$route->route($1)', $text);
+        $text = preg_replace('/route\(\)/', '$route->route()', $text);
         //{{-- , --}}
         $text = preg_replace('/\{\{--(.+?)--\}\}/s', '<?php /* $1 */ ?>', $text);
         $text = preg_replace('/\{\{(.+?)\}\}/', '<?php echo htmlspecialchars($1); ?>', $text);
@@ -96,12 +99,14 @@ class View
         $text = preg_replace('/@elseif(.+?)\n/', '<?php elseif$1: ?>', $text);
         $text = preg_replace('/@endif\n/', '<?php endif; ?>', $text);
         // @foreach, @endforeach
-        $text = preg_replace('/@foreach(.+?)\n/', '<?php foreach$1: ?>', $text);
-        $text = preg_replace('/@endforeach\n/', '<?php endforeach; ?>', $text);
+        $text = preg_replace('/@foreach(.+?)\n/', '<?php $loop_index = 0; foreach$1: ?>', $text);
+        $text = preg_replace('/@endforeach\n/', '<?php $loop_index++; endforeach; ?>', $text);
         // @for, @endfor
         $text = preg_replace('/@for(.+?)\n/', '<?php for$1: ?>', $text);
         $text = preg_replace('/@endfor\n/', '<?php endfor; ?>', $text);
         // @while, @endwhile
+        // @break
+        $text = preg_replace('/@break\n/', '<?php break; ?>', $text);
         $text = preg_replace('/@while(.+?)\n/', '<?php while$1: ?>', $text);
         $text = preg_replace('/@endwhile\n/', '<?php endwhile; ?>', $text);
         // @switch, @case, @default, @endswitch
@@ -109,6 +114,8 @@ class View
         $text = preg_replace('/@case(.+?)\n/', '<?php case$1: ?>', $text);
         $text = preg_replace('/@default\n/', '<?php default: ?>', $text);
         $text = preg_replace('/@endswitch\n/', '<?php endswitch; ?>', $text);
+        //@continue
+        $text = preg_replace('/@continue\n/', "<?php continue; \n?>", $text);
         // @include
         $text = preg_replace('/@include\((.+?)\)/', '<?php include $1; ?>', $text);
         self::handlerLayout($text);
@@ -118,6 +125,7 @@ class View
         // @section, @endsection
         $text = preg_replace('/@section\("(.+?)"\)/', '', $text);
         $text = preg_replace('/@endsection\n/', '', $text);
+
         // lưu vào cache       
         // thêm {{-- $path | date()--}} và đầu file
         $text = '<?php /*' . $path . ' | ' . date('Y-m-d H:i:s') . '*/ ?>' . "\n" . $text;

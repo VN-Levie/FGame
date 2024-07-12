@@ -10,8 +10,21 @@ class ForumController extends Controller
 {
     public function index()
     {
+        global $user;
+        if (!$user) {
+            return View::abort(403, 'Vui lòng đăng nhập');
+        }
+        //check role 
+        if (!$user->checkRole("mod")) {
+            return View::abort(403, 'Bạn không có quyền truy cập trang này');
+        }
+        $category = $_GET['category'] ?? null;
         $post_dependents = [['ForumCategory', 'category_id'], ['User']];
-        $posts = Forum::whereWiths($post_dependents, sort_by: 'DESC');
+        $condition = [];
+        if ($category != null) {
+            $condition = ['category_id' => $category];
+        }
+        $posts = Forum::whereWiths($post_dependents, $condition, sort_by: 'DESC');
         // var_dump($posts);
         $data = [
             'title' => 'Quản lý bài viết forum',
@@ -25,6 +38,14 @@ class ForumController extends Controller
     //form post
     public function postForm()
     {
+        global $user;
+        if (!$user) {
+            return View::abort(403, 'Vui lòng đăng nhập');
+        }
+        //check role 
+        if (!$user->checkRole("mod")) {
+            return View::abort(403, 'Bạn không có quyền truy cập trang này');
+        }
         $id = $_GET['id'] ?? null;
         $form_categories = ForumCategory::all();
         $post = Forum::find($id) ?? null;
@@ -186,14 +207,21 @@ class ForumController extends Controller
         $post->save();
         return $this->json([
             'status' => 'success',
-            'message' => ($post->hide ? 'Khóa' : 'Mở'). '  bình luận bài viết thành công'
+            'message' => ($post->hide ? 'Khóa' : 'Mở') . '  bình luận bài viết thành công'
         ]);
     }
 
 
     public function categories()
     {
-
+        global $user;
+        if (!$user) {
+            return View::abort(403, 'Vui lòng đăng nhập');
+        }
+        //check role 
+        if (!$user->checkRole("mod")) {
+            return View::abort(403, 'Bạn không có quyền truy cập trang này');
+        }
         $dependents = [['User']];
         $form_categories = ForumCategory::whereWiths($dependents);
         // print_r($form_categories);
@@ -206,6 +234,14 @@ class ForumController extends Controller
     //create category
     public function categoryForm()
     {
+        global $user;
+        if (!$user) {
+            return View::abort(403, 'Vui lòng đăng nhập');
+        }
+        //check role 
+        if (!$user->checkRole("mod")) {
+            return View::abort(403, 'Bạn không có quyền truy cập trang này');
+        }
         $id = $_GET['id'] ?? null;
         // if($id == null){
         //     return View::abort(404, 'Danh mục không tồn tại');
@@ -292,7 +328,7 @@ class ForumController extends Controller
         if (!$user->checkRole("admin")) {
             return $this->json([
                 'status' => 'error',
-                'message' => 'Bạn không có quyền'
+                'message' => 'Chỉ admin mới có thể lưu trữ/khôi phục danh mục'
             ]);
         }
         $id = $_POST['id'] ?? null;
@@ -309,17 +345,26 @@ class ForumController extends Controller
                 'message' => 'Danh mục không tồn tại'
             ]);
         }
-        if ($category->soft_delete && !$user->checkRole("s-admin")) {
+        if ($category->soft_delete && !$user->checkRole("admin")) {
             return $this->json([
                 'status' => 'error',
-                'message' => 'Chỉ s-admin mới có thể khôi phục danh mục'
+                'message' => 'Chỉ admin mới có thể khôi phục danh mục'
             ]);
+        }
+        $posts = $category->posts();
+        $c = 0;
+        foreach ($posts as $post) {
+            if ($post->soft_delete == 0) {
+                $post->archive_by_category = abs($post->archive_by_category - 1);
+                $post->save();
+                $c++;
+            }
         }
         $category->soft_delete = abs($category->soft_delete - 1);
         $category->save();
         return $this->json([
             'status' => 'success',
-            'message' =>  $category->soft_delete ? 'Xóa danh mục thành công' : 'Khôi phục danh mục thành công'
+            'message' => 'Đã ' . ($category->soft_delete ? 'lưu trữ' : 'khôi phục') . ' danh mục và ' . number_format($c) . ' bài viết đi kèm'
         ]);
     }
 
@@ -358,7 +403,7 @@ class ForumController extends Controller
         $category->save();
         return $this->json([
             'status' => 'success',
-            'message' => ($category->hide ? 'Khóa' : 'Mở'). '  đăng bài viết mới trong danh mục thành công'
+            'message' => ($category->hide ? 'Khóa' : 'Mở') . '  đăng bài viết mới trong danh mục thành công'
         ]);
     }
 }

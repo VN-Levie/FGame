@@ -41,11 +41,25 @@ class AuthController extends Controller
                 'message' => 'Tài khoản không tồn tại'
             ]);
         }
+        //check baned
+        if ($user->baned == 1) {
+            return $this->json([
+                'status' => 'error',
+                'message' => 'Tài khoản đã bị khóa'
+            ]);
+        }
+        //check soft_delete
+        if ($user->soft_delete == 1) {
+            return $this->json([
+                'status' => 'error',
+                'message' => 'Tài khoản không tồn tại.'
+            ]);
+        }
         //check password
         if ($password != $user->password) {
             return $this->json([
                 'status' => 'error',
-                'message' => 'Mật khẩu không đúng'
+                'message' => 'Tài khoản không tồn tại!'
             ]);
         }
 
@@ -115,7 +129,7 @@ class AuthController extends Controller
         $user->username = $username;
         $user->password = $password;
         $user->email = '';
-        $user->roles = 0;
+        $user->role = 0;
         $user->save();
 
         $this->json([

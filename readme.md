@@ -1,215 +1,349 @@
-# Cấu trúc dự án Fgame: Diễn đàn trao đổi game
+Dưới đây là file README.md đã được chỉnh sửa và sắp xếp lại cho hợp lý và chuyên nghiệp hơn, với phần chạy ứng dụng được cập nhật theo yêu cầu của bạn:
 
-#### 1. Cấu trúc dự án
+---
 
-Dự án sẽ được xây dựng theo mô hình MVC (Model-View-Controller) với PHP Core, MySQL sử dụng PDO, HTML, CSS, JavaScript và AJAX. Cấu trúc thư mục dự kiến sẽ như sau:
+# Fgame: Diễn đàn trao đổi game
 
-```
+Fgame là một diễn đàn trao đổi game, nơi người dùng có thể thảo luận về các game, đăng bài viết, bình luận và nhiều hơn nữa. Dự án này được xây dựng bằng PHP Core, MySQL (sử dụng PDO), HTML, CSS, JavaScript và AJAX theo mô hình MVC (Model-View-Controller).
+
+## 1. Cấu trúc dự án
+
+Dự án sẽ có cấu trúc thư mục như sau:
+
+```markdown
 fgame/
-├── index.php
 ├── assets/
-│   ├── css/
-│   │   └── styles.css
-│   ├── js/
-│   │   └── scripts.js
-│   └── images/
-├── config/
-│   └── config.php
+├── cache/
+│   └── views/
+├── commands/
+│   ├── GreetCommand.php
+│   ├── MakeControllerCommand.php
+│   ├── MakeModelCommand.php
+│   ├── MakeViewCommand.php
+│   └── ServeCommand.php
 ├── controllers/
-│   ├── HomeController.php
-│   ├── GameController.php
 │   ├── AuthController.php
+│   ├── Controller.php
+│   ├── DashboardController.php
 │   ├── ForumController.php
-│   └── ...
+│   ├── GameController.php
+│   ├── HomeController.php
+│   └── ProductController.php
+├── core/
+│   ├── Application.php
+│   ├── ConsoleColor.php
+│   ├── Database.php
+│   ├── Helper.php
+│   ├── Route.php
+│   └── View.php
 ├── models/
-│   ├── Game.php
-│   ├── User.php
-│   ├── Forum.php
-│   ├── Post.php
-│   └── ...
 ├── views/
-│   ├── templates/
-│   │   ├── header.php
-│   │   └── footer.php
-│   ├── home/
-│   │   └── index.php
-│   ├── game/
-│   │   ├── list.php
-│   │   ├── detail.php
-│   │   └── ...
 │   ├── auth/
-│   │   ├── login.php
-│   │   ├── register.php
-│   │   └── ...
-│   ├── forum/
-│   │   ├── index.php
-│   │   ├── thread.php
-│   │   ├── new_thread.php
-│   │   └── ...
-│   └── ...
-└── core/
-    ├── Database.php
-    ├── Controller.php
-    ├── Model.php
-    └── View.php
+│   ├── dashboard/
+│   ├── home/
+│   ├── layouts/
+│   └── error.blade.php
+├── .gitignore
+├── .htaccess
+├── artisan
+├── hieu_fgame.sql
+├── index.php
+├── readme.md
+└── run.bat
 ```
 
-#### 2. Cấu trúc thiết kế cơ sở dữ liệu
+## 2. Cấu trúc thiết kế cơ sở dữ liệu
 
 Cơ sở dữ liệu sẽ bao gồm các bảng chính như sau:
 
 - `users`: Quản lý thông tin người dùng.
 - `games`: Quản lý thông tin game.
-- `threads`: Quản lý các chủ đề thảo luận.
-- `posts`: Quản lý các bài viết trong các chủ đề thảo luận.
-- `comments`: Quản lý bình luận về các game và các bài viết trong diễn đàn.
+- `game_categories`: Quản lý các danh mục game.
+- `platforms`: Quản lý các nền tảng chơi game.
+- `forums`: Quản lý các chủ đề thảo luận.
+- `forum_categories`: Quản lý các danh mục chủ đề thảo luận.
+- `forum_comments`: Quản lý các bình luận trong chủ đề thảo luận.
+- `forum_edited_histories`: Quản lý lịch sử chỉnh sửa chủ đề thảo luận.
+- `carts`: Quản lý giỏ hàng của người dùng.
+- `orders`: Quản lý đơn hàng.
+- `payment_methods`: Quản lý phương thức thanh toán.
+- `products`: Quản lý các sản phẩm.
+- `product_categories`: Quản lý các danh mục sản phẩm.
+- `digital_template`: Quản lý các mẫu kỹ thuật số.
+- `customer_address`: Quản lý địa chỉ khách hàng.
+- `reactions`: Quản lý các phản ứng (reaction) cho các chủ đề thảo luận.
+- `traffics`: Quản lý lưu lượng truy cập.
+Dưới đây là cấu trúc chi tiết của các bảng:
 
 ```sql
-
-CREATE TABLE `forum` (
- `id` int NOT NULL AUTO_INCREMENT,
- `parent_id` int DEFAULT NULL,
- `content` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
- `type` varchar(255) COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'm_thread',
- `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
- `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
- PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
+CREATE TABLE `users` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `username` varchar(50) COLLATE utf8mb4_general_ci NOT NULL,
+  `password` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `email` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `role` int NOT NULL DEFAULT '0' COMMENT '0: user,1: seller, 3: mod, 5: s-mod, 8: admin, 9: s-admin',
+  `baned` int NOT NULL DEFAULT '0',
+  `soft_delete` tinyint(1) NOT NULL DEFAULT '0',
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE `games` (
- `id` int NOT NULL AUTO_INCREMENT,
- `title` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
- `description` text COLLATE utf8mb4_general_ci,
- `release_date` date DEFAULT NULL,
- `platform_id` int DEFAULT NULL,
- `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
- `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
- PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
+  `id` int NOT NULL AUTO_INCREMENT,
+  `title` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
+  `description` text COLLATE utf8mb4_general_ci,
+  `release_date` date DEFAULT NULL,
+  `platform_id` int DEFAULT NULL,
+  `game_category_id` int NOT NULL,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE `game_categories` (
- `id` int NOT NULL AUTO_INCREMENT,
- `name` varchar(50) COLLATE utf8mb4_general_ci NOT NULL,
- `description` text COLLATE utf8mb4_general_ci,
- `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
- `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
- PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) COLLATE utf8mb4_general_ci NOT NULL,
+  `description` text COLLATE utf8mb4_general_ci,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE `platforms` (
- `id` int NOT NULL AUTO_INCREMENT,
- `name` int NOT NULL,
- `description` text COLLATE utf8mb4_general_ci,
- `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
- `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
- PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `description` text COLLATE utf8mb4_general_ci,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-CREATE TABLE `users` (
- `id` int NOT NULL AUTO_INCREMENT,
- `username` varchar(50) COLLATE utf8mb4_general_ci NOT NULL,
- `password` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
- `email` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
- `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
- PRIMARY KEY (`id`),
- UNIQUE KEY `username` (`username`),
- UNIQUE KEY `email` (`email`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
+CREATE TABLE `forums` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `category_id` int NOT NULL,
+  `title` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `content` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `views` int NOT NULL DEFAULT '0',
+  `soft_delete` tinyint(1) NOT NULL DEFAULT '0',
+  `hide` tinyint(1) NOT NULL DEFAULT '0',
+  `archive_by_category` tinyint(1) NOT NULL DEFAULT '0',
+  `user_id` int NOT NULL,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE `forum_categories` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
+  `soft_delete` tinyint(1) NOT NULL DEFAULT '0',
+  `hide` tinyint(1) NOT NULL DEFAULT '0',
+  `user_id` int NOT NULL,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE `forum_comments` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `content` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `forum_id` int NOT NULL,
+  `user_id` int NOT NULL,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE `forum_edited_histories` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `forum_id` int NOT NULL,
+  `previous_content` text COLLATE utf8mb4_general_ci NOT NULL,
+  `new_content` text COLLATE utf8mb4_general_ci NOT NULL,
+  `user_id` int NOT NULL,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE `carts` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `product_id` int NOT NULL,
+  `quantity` int NOT NULL DEFAULT '0',
+  `user_id` int NOT NULL,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE `orders` (
+  `id`
+
+ int NOT NULL AUTO_INCREMENT,
+  `product_id` int NOT NULL,
+  `quantity` int NOT NULL DEFAULT '0',
+  `product_price` int NOT NULL,
+  `total` int NOT NULL,
+  `status` varchar(255) COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'pending',
+  `customer_note` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `seller_note` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `customer_address_id` int NOT NULL,
+  `payment_method_id` int NOT NULL,
+  `user_id` int NOT NULL,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE `payment_methods` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `type` varchar(255) COLLATE utf8mb4_general_ci NOT NULL COMMENT 'cod,card,paypal',
+  `detail` varchar(561) COLLATE utf8mb4_general_ci NOT NULL,
+  `user_id` int NOT NULL,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE `products` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `description` text COLLATE utf8mb4_general_ci NOT NULL,
+  `price` int NOT NULL,
+  `stock` int NOT NULL,
+  `is_digital` tinyint(1) NOT NULL DEFAULT '0',
+  `digital_info` json DEFAULT NULL,
+  `digital_template_id` int NOT NULL DEFAULT '0',
+  `category_id` int NOT NULL,
+  `status` int NOT NULL COMMENT '0 out-stock,1 in-stock, 2 Waiting for import, 3 new',
+  `pinned` tinyint(1) NOT NULL DEFAULT '0',
+  `views` int NOT NULL DEFAULT '0',
+  `user_id` int NOT NULL,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE `product_categories` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE `digital_template` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'digital template',
+  `description` text COLLATE utf8mb4_general_ci,
+  `template` json DEFAULT NULL,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE `customer_address` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `customer_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `phone` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `address` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `user_id` int NOT NULL,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE `reactions` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `thread_id` int NOT NULL,
+  `user_id` int NOT NULL,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE `traffics` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `ip` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `user_agent` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
+  `user_id` int DEFAULT '-1',
+  `count_up` int NOT NULL DEFAULT '0',
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 ```
 
-#### 3. Chi tiết cấu trúc MVC
+## 3. Các chức năng chính
 
-**Model:**
+- Quản lý người dùng (đăng ký, đăng nhập, chỉnh sửa thông tin, v.v.)
+- Quản lý game và danh mục game
+- Quản lý nền tảng chơi game
+- Quản lý chủ đề thảo luận và bình luận trong diễn đàn
+- Quản lý lịch sử chỉnh sửa chủ đề
+- Quản lý giỏ hàng và đơn hàng
+- Quản lý phương thức thanh toán
+- Quản lý sản phẩm và danh mục sản phẩm
+- Quản lý mẫu kỹ thuật số
+- Quản lý địa chỉ khách hàng
+- Quản lý phản ứng (reaction) cho các chủ đề thảo luận
+- Quản lý lưu lượng truy cập
 
-- `Game.php`, `User.php`, `Forum.php`, `Post.php`: Các model này sẽ tương tác với cơ sở dữ liệu để thực hiện các thao tác CRUD (Create, Read, Update, Delete).
+## 4. Cài đặt
 
-**View:**
+### Các tính năng chính
 
-- Các view sẽ chứa các file HTML/PHP để hiển thị giao diện người dùng. Các template header và footer sẽ được sử dụng lại trong các trang khác nhau.
-- `views/forum/index.php`: Trang hiển thị danh sách các chủ đề thảo luận.
-- `views/forum/thread.php`: Trang hiển thị chi tiết một chủ đề cùng các bài viết.
-- `views/forum/new_thread.php`: Trang tạo chủ đề mới.
+- **Kiến trúc MVC**: Tổ chức ứng dụng thành các model, view và controller, giúp dễ dàng quản lý và mở rộng.
+- **Routing tùy chỉnh**: Sử dụng cơ chế định tuyến tùy chỉnh được định nghĩa trong [`index.php`] để ánh xạ các URL tới các controller và phương thức tương ứng.
+- **Giao diện dòng lệnh (CLI)**: Cung cấp công cụ CLI [`artisan`] để thực hiện các nhiệm vụ như tạo model, controller, và view.
+- **Quản lý cơ sở dữ liệu**: Quản lý kết nối và thao tác cơ sở dữ liệu thông qua lớp [`Database.php`] sử dụng PDO.
+- **Quản lý phiên làm việc**: Xử lý các phiên làm việc của người dùng, bao gồm trạng thái đăng nhập và duy trì dữ liệu người dùng qua các yêu cầu.
+- **Giám sát lưu lượng**: Bao gồm chức năng giám sát và ghi lại lưu lượng ứng dụng trong [`models/Traffic.php`].
 
-**Controller:**
+### Bắt đầu
 
-- `HomeController.php`, `GameController.php`, `AuthController.php`, `ForumController.php`: Các controller này sẽ điều hướng các yêu cầu từ người dùng, tương tác với model và trả về view tương ứng.
+1. **Cài đặt môi trường**: Đảm bảo PHP và MySQL đã được cài đặt trên hệ thống của bạn.
+2. **Clone Repository**: Clone dự án về máy tính của bạn.
+   ```sh
+   git clone https://github.com/username/fgame.git
+   ```
+3. **Cấu hình cơ sở dữ liệu**: Tạo cơ sở dữ liệu MySQL và nhập [`hieu_fgame.sql`] để thiết lập cấu trúc cơ sở dữ liệu ban đầu.
+4. **Cấu hình ứng dụng**: Cập nhật các cài đặt kết nối cơ sở dữ liệu trong [`core/Database.php`].
+5. **Chạy ứng dụng**: Sử dụng máy chủ web để phục vụ tệp [`index.php`] ở thư mục gốc của dự án. Hoặc sử dụng lệnh sau để chạy ứng dụng với Artisan CLI:
+   ```sh
+   php artisan serve --host=127.0.0.1 --port=8000
+   ```
 
-**Core:**
+## Routing
 
-- `Database.php`: Quản lý kết nối cơ sở dữ liệu.
-- `Controller.php`: Lớp cơ sở cho tất cả các controller, chứa các phương thức tiện ích chung.
-- `Model.php`: Lớp cơ sở cho tất cả các model, chứa các phương thức tiện ích chung.
-- `View.php`: Lớp quản lý view, hỗ trợ render các view với dữ liệu truyền vào.
+Ứng dụng sử dụng cơ chế định tuyến đơn giản để điều hướng các yêu cầu tới controller và phương thức phù hợp dựa trên URL. Điều này được thực hiện thông qua [`.htaccess`] cho máy chủ Apache, chuyển hướng tất cả lưu lượng tới [`index.php`] nơi logic định tuyến được định nghĩa.
 
-**Config:**
+## Công cụ CLI
 
-- `config.php`: Chứa các cấu hình của dự án như thông tin kết nối cơ sở dữ liệu.
+Script [`artisan`] cung cấp giao diện dòng lệnh để thực hiện các nhiệm vụ phổ biến như tạo model, controller, và view. Nó đơn giản hóa quá trình phát triển bằng cách tự động hóa việc tạo mã mẫu.
 
-**Index.php:**
+### Yêu cầu hệ thống
 
-- File chính của dự án, điều hướng route và gọi controller tương ứng dựa trên yêu cầu của người dùng.
+- PHP >= 7.4
+- MySQL >= 5.7
+- Apache hoặc Nginx
 
-#### Hướng phát triển dự án
+### Hướng dẫn cài đặt
 
-1. **Thiết lập cấu trúc dự án:**
-   - Tạo các thư mục và file cần thiết.
-   - Thiết lập kết nối cơ sở dữ liệu trong `config/config.php`.
+1. Clone repository:
+   ```sh
+   git clone https://github.com/vn-levie/fgame.git
+   ```
 
-2. **Xây dựng lớp core:**
-   - `Database.php`: Quản lý kết nối cơ sở dữ liệu bằng PDO.
-   - `Controller.php`, `Model.php`, `View.php`: Xây dựng các lớp cơ sở cho MVC.
+2. Cấu hình cơ sở dữ liệu trong file `config/config.php`.
 
-3. **Xây dựng các model:**
-   - `Game.php`, `User.php`, `Forum.php`, `Post.php`: Tạo các model tương ứng với bảng trong cơ sở dữ liệu.
+3. Chạy các lệnh SQL để tạo bảng và dữ liệu ban đầu trong cơ sở dữ liệu của bạn.
 
-4. **Xây dựng các controller:**
-   - `HomeController.php`, `GameController.php`, `ForumController.php`: Xây dựng các phương thức xử lý yêu cầu.
+4. Truy cập trang web thông qua trình duyệt web của bạn.
 
-5. **Xây dựng các view:**
-   - Tạo các file giao diện trong thư mục `views/` và các template chung như header, footer.
-   - Thiết kế giao diện cho diễn đàn, bao gồm trang chủ đề, trang chi tiết chủ đề và trang tạo chủ đề mới.
+## 5. Góp ý và phát triển
 
-6. **Thiết lập routing trong `index.php`:**
-   - Điều hướng các yêu cầu đến controller và phương thức tương ứng.
-
-#### Cấu trúc ví dụ cho file index.php
-
-```php
-<?php
-require_once 'core/Database.php';
-require_once 'core/Controller.php';
-require_once 'core/Model.php';
-require_once 'core/View.php';
-
-$url = isset($_GET['url']) ? $_GET['url'] : '';
-$url = rtrim($url, '/');
-$url = filter_var($url, FILTER_SANITIZE_URL);
-$url = explode('/', $url);
-
-$controllerName = !empty($url[0]) ? ucfirst($url[0]) . 'Controller' : 'HomeController';
-$methodName = isset($url[1]) ? $url[1] : 'index';
-$params = array_slice($url, 2);
-
-if (file_exists("controllers/$controllerName.php")) {
-    require_once "controllers/$controllerName.php";
-    $controller = new $controllerName();
-
-    if (method_exists($controller, $methodName)) {
-        call_user_func_array([$controller, $methodName], $params);
-    } else {
-        echo "Method $methodName not found.";
-    }
-} else {
-    echo "Controller $controllerName not found.";
-}
-?>
-```
-
-```htaccess
-RewriteEngine On
-#điều hướng mọi request về index.php
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^(.*)$ index.php?url=$1 [L,QSA]
-
-```
+Chúng tôi luôn chào đón các góp ý và đề xuất từ cộng đồng. Nếu bạn muốn đóng góp, vui lòng tạo một pull request hoặc mở một issue mới trên GitHub.

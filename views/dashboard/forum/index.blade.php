@@ -30,26 +30,34 @@
                                                   </tr>
                                              </thead>
                                              <tbody>
-                                                  @foreach ($posts as $post)
+                                                  @if (count($posts) == 0)
+                                                       <tr>
+                                                            <td colspan="6" class="text-center">Không có dữ liệu</td>
+                                                       </tr>
+                                                  @endif
+                                                  @foreach ($posts as $row)
                                                        <tr>
                                                             {{-- <pre>
-                                                              {{ print_r($post) }}
+                                                              {{ print_r($row) }}
                                                        </pre> --}}
+                                                            @if (($row->soft_delete && $user->checkRole("admin") == false) || $row->archive_by_category)
+                                                                 @continue
+                                                            @endif
 
-                                                            <th scope="row"> {{ $post->id }} </th>
-                                                            <td> {{ $post->title }} </td>
-                                                            <td> {{ $post?->forum_category?->name ?? null }} </td>
-                                                            <td> {{ $post?->user?->username ?? null }} </td>
-                                                            <td> {{ number_format($post->views) }}</td>
-                                                            <td> {{ $post->created_at }} </td>
+                                                            <th scope="row"> {{ $row->id }} </th>
+                                                            <td> {{ $row->title }} </td>
+                                                            <td> {{ $row?->forum_category?->name ?? null }} </td>
+                                                            <td> {{ $row?->user?->username ?? null }} </td>
+                                                            <td> {{ number_format($row->views) }}</td>
+                                                            <td> {{ $row->created_at }} </td>
                                                             <td>
                                                                  {{-- <a href="#" class="btn btn-sm btn-primary">View</a> --}}
-                                                                 <a href="{{ route("dashboard.forum.form.post", ["id" => $post->id]) }}" class="btn btn-sm btn-warning">Sửa</a>
-                                                                 <a onclick="del({{ $post->id }})" class="btn btn-sm btn-{{ $post->soft_delete ? 'success' : 'danger' }}">
-                                                                      {{ $post->soft_delete ? 'Khôi phục' : 'Xóa' }}
+                                                                 <a href="{{ route("dashboard.forum.form.post", ["id" => $row->id]) }}" class="btn btn-sm btn-warning">Sửa</a>
+                                                                 <a onclick="del({{ $row->id }})" class="btn btn-sm btn-{{ $row->soft_delete ? "success" : "danger" }}">
+                                                                      {{ $row->soft_delete ? "Khôi phục" : "Xóa" }}
                                                                  </a>
-                                                                 <a onclick="hide({{ $post->id }})" class="btn btn-sm btn-{{ $post->hide ? 'success' : 'danger' }}">
-                                                                      {{ $post->hide ? 'Mở' : 'Khóa' }}
+                                                                 <a onclick="hide({{ $row->id }})" class="btn btn-sm btn-{{ $row->hide ? "success" : "danger" }}">
+                                                                      {{ $row->hide ? "Mở" : "Khóa" }}
                                                                  </a>
 
                                                             </td>
@@ -70,7 +78,6 @@
           </main>
      </div>
      <script>
-         
           function del(id) {
                Swal.fire({
                     title: 'Thực hiện thao tác?',
@@ -100,8 +107,8 @@
                                         });
                                    } else {
                                         Swal.fire(
-                                             'Xóa không thành công!',
-                                             'Có lỗi xảy ra.',
+                                             'Thao tác không thành công!',
+                                             data.message,
                                              'error'
                                         );
                                    }
@@ -140,8 +147,8 @@
                                         });
                                    } else {
                                         Swal.fire(
-                                             'Xóa không thành công!',
-                                             'Có lỗi xảy ra.',
+                                             'Thao tác không thành công!',
+                                             data.message,
                                              'error'
                                         );
                                    }

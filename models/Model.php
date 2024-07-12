@@ -103,14 +103,14 @@ class Model
     //Forum::where('category_id', $this->id)
     public static function where($column, $value)
     {
-        $stmt = self::$db->prepare('SELECT * FROM ' . static::$table . ' WHERE ' . $column . ' = :value');
+        $stmt = self::$db->prepare('SELECT * FROM ' . static::getTableName() . ' WHERE ' . $column . ' = :value');
         $stmt->bindParam(':value', $value);
         $stmt->setFetchMode(PDO::FETCH_CLASS, get_called_class());
         $stmt->execute();
         return $stmt->fetchAll();
     }
 
-    //find with condition
+    //find with condition [['column' => 'value']]
     public static function findWhere($conditions)
     {
         $table_name = static::getTableName();
