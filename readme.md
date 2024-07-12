@@ -303,10 +303,18 @@ CREATE TABLE `traffics` (
 
 ### Bắt đầu
 
+
+#### Yêu cầu hệ thống
+
+- PHP >= 7.4
+- MySQL >= 5.7
+- Apache hoặc Nginx
+
+
 1. **Cài đặt môi trường**: Đảm bảo PHP và MySQL đã được cài đặt trên hệ thống của bạn.
 2. **Clone Repository**: Clone dự án về máy tính của bạn.
-   ```sh
-   git clone https://github.com/username/fgame.git
+    ```sh
+   git clone https://github.com/VN-Levie/FGame.git
    ```
 3. **Cấu hình cơ sở dữ liệu**: Tạo cơ sở dữ liệu MySQL và nhập [`hieu_fgame.sql`] để thiết lập cấu trúc cơ sở dữ liệu ban đầu.
 4. **Cấu hình ứng dụng**: Cập nhật các cài đặt kết nối cơ sở dữ liệu trong [`core/Database.php`].
@@ -323,24 +331,6 @@ CREATE TABLE `traffics` (
 
 Script [`artisan`] cung cấp giao diện dòng lệnh để thực hiện các nhiệm vụ phổ biến như tạo model, controller, và view. Nó đơn giản hóa quá trình phát triển bằng cách tự động hóa việc tạo mã mẫu.
 
-### Yêu cầu hệ thống
-
-- PHP >= 7.4
-- MySQL >= 5.7
-- Apache hoặc Nginx
-
-### Hướng dẫn cài đặt
-
-1. Clone repository:
-   ```sh
-   git clone [https://github.com/vn-levie/fgame.git](https://github.com/VN-Levie/FGame.git)
-   ```
-
-2. Cấu hình cơ sở dữ liệu trong file `Core/Database.php`.
-
-3. Chạy các lệnh SQL để tạo bảng và dữ liệu ban đầu trong cơ sở dữ liệu của bạn.
-
-4. Truy cập trang web thông qua trình duyệt web của bạn.
 
 ## 5. Góp ý và phát triển
 
