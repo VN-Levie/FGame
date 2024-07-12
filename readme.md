@@ -1,6 +1,4 @@
-Dưới đây là file README.md đã được chỉnh sửa và sắp xếp lại cho hợp lý và chuyên nghiệp hơn, với phần chạy ứng dụng được cập nhật theo yêu cầu của bạn:
 
----
 
 # Fgame: Diễn đàn trao đổi game
 
